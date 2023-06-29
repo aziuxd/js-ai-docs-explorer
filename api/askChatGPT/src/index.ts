@@ -25,12 +25,12 @@ async function start() {
       const res = await fetch(`http://localhost:4000/cognitive/${query}`);
       const data = await res.json();
       const { data: parsedData }: { data: string[] } = data;
-      if (!parsedData?.length) return "No data matching your query";
-
+      //if (!parsedData?.length) return "No data matching your query";
+      console.log(parsedData);
       const newQuery = `${query}, sapendo che: ${parsedData.slice(0, 15)}`;
 
-      const gptRes = await requestGPTCompletion(newQuery);
-
+      let gptRes = await requestGPTCompletion(newQuery);
+      if (parsedData?.length) gptRes = `Secondo la documentazione: \n${gptRes}`;
       return JSON.stringify(gptRes);
     } catch (err) {
       return JSON.stringify({ err });

@@ -2,9 +2,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import fastify, { FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
-import { Configuration, OpenAIApi } from "openai";
 import { AzureKeyCredential, SearchClient } from "@azure/search-documents";
-import { formatQueryForSearch } from "../../helpers";
+import { optimizeQuery } from "../../helpers";
 
 async function start() {
   const app = fastify();
@@ -26,17 +25,15 @@ async function start() {
       const endpoint = process.env.SEARCH_ENDPOINT as string;
       const api_key = process.env.API_KEY as string;
 
-      const optimizedQuery = formatQueryForSearch(query);
-      console.log(optimizedQuery);
-
+      const optimizedQuery = optimizeQuery(query);
       const credentials = new AzureKeyCredential(api_key);
       const client = new SearchClient(endpoint, index, credentials);
 
-      const results = await client.search(optimizedQuery, {
+      let results = await client.search(optimizedQuery, {
         highlightFields: "content",
       });
 
-      const res = [];
+      let res = [];
 
       for await (const result of results.results) {
         //@ts-ignore
@@ -45,7 +42,22 @@ async function start() {
         }
       }
 
-      return JSON.stringify({ data: res });
+      //if there some cognitive search data return them
+      if (!Object.is(res, [])) return JSON.stringify({ data: res });
+      //if not redo the process without stemming (sometimes this can be the issue)
+      else {
+        results = await client.search(optimizeQuery(query, false), {
+          highlightFields: "content",
+        });
+
+        for await (const result of results.results) {
+          //@ts-ignore
+          for (const curr_highlight of result.highlights?.content) {
+            res.push(curr_highlight);
+          }
+        }
+        return JSON.stringify({ data: res });
+      }
     } catch (err) {
       return JSON.stringify({ err });
     }
