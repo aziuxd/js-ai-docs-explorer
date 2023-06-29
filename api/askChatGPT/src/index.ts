@@ -2,7 +2,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import fastify, { FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
-import { Configuration } from "openai";
 import fetch from "node-fetch";
 import { requestGPTCompletion } from "../../helpers";
 import LanguageDetect from "languagedetect";
@@ -13,10 +12,6 @@ async function start() {
   await app.register(cors, {
     origin: "http://localhost:3000",
     allowedHeaders: ["Authorization", "Content-Type"],
-  });
-
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_KEY,
   });
 
   app.get("/api/AskChatGPT/:query", async function (req: FastifyRequest, res) {
