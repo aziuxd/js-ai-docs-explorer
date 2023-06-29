@@ -1,0 +1,30 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start-gpt": "ts-node askChatGPT/src/index.ts",
+    "dev-gpt": "nodemon --exec ts-node askChatGPT/src/index.ts",
+    "start-silwa": "ts-node Silwa/src/index.ts",
+    "dev-silwa": "nodemon --exec ts-node Silwa/src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/search-documents": "^11.3.1",
+    "fastify": "^4.18.0",
+    "openai": "^3.3.0"
+  },
+  "devDependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@types/node": "^20.3.2",
+    "dotenv": "^16.3.1",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
