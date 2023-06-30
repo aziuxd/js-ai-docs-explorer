@@ -4,11 +4,16 @@ import { Textarea, Button } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 
+interface CustomError {
+  message?: string;
+}
+
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [queryData, setQueryData] = useState<string>("");
-  const inputRef =
-    useRef<React.MutableRefObject<HTMLTextAreaElement | null>>(null);
+  const inputRef = useRef(
+    null
+  ) as React.MutableRefObject<HTMLTextAreaElement | null>;
 
   const onSubmit = async () => {
     try {
@@ -24,7 +29,8 @@ export default function Home() {
 
       setQueryData(data);
     } catch (err) {
-      setQueryData(err?.message);
+      const typedErr = err as CustomError;
+      setQueryData(typedErr?.message as string);
     }
   };
 
