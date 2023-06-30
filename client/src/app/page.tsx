@@ -1,6 +1,6 @@
 "use client";
 import "./styles.css";
-import { Textarea, Button } from "@mantine/core";
+import { Textarea, Button, Avatar } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
@@ -100,6 +100,8 @@ export default function Home() {
       style={{
         display: "grid",
         gridTemplateColumns: "20fr 60fr 20fr",
+        //backgroundColor: "#71717a",
+        backgroundColor: "#a1a1aa",
       }}
       className="main"
     >
@@ -115,44 +117,19 @@ export default function Home() {
           gap: "1rem",
           padding: "20px",
           paddingTop: "40px",
-          backgroundColor: "gray",
+          //backgroundColor: "#9ca3af",
+          backgroundColor: "#a1a1aa",
           position: "relative",
         }}
       >
-        <PrettifiedData data={queryData} />
-        <form
-          style={{
-            display: "flex",
-            position: "absolute",
-            bottom: "10px",
-            width: "95%",
-            border: "2px solid red",
-          }}
-          id="searchQueryForm"
-          name="confermationForm"
-          onSubmit={async (e) => {
-            e.preventDefault();
-          }}
-        >
-          <Textarea
-            ref={inputRef}
-            placeholder="Search for something"
-            style={{
-              width: "100%",
-            }}
-            form="searchQueryForm"
-            className="search-query"
-            rightSection={
-              <BtnSubmit
-                onSubmit={onSubmit}
-                searchQuery={searchQuery}
-                newData={newData}
-              />
-            }
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </form>
+        {queryData ? <PrettifiedData data={queryData} /> : ""}
+        <CustomInput
+          inputRef={inputRef}
+          searchQuery={searchQuery}
+          onSubmit={onSubmit}
+          setSearchQuery={setSearchQuery}
+          newData={newData}
+        />
       </div>
       <div></div>
     </main>
@@ -168,19 +145,31 @@ const BtnSubmit = ({
   searchQuery: string;
   newData: boolean;
 }) => {
-  useEffect(() => {
-    console.log("cond: ", !searchQuery && newData);
-  });
-
   return (
     <Button
       onClick={onSubmit}
+      color="#71717a "
       style={{
-        margin: 0,
+        display: "flex",
+        width: "10%",
+        height: "100%",
+        backgroundColor: "#71717a !important",
+        position: "absolute",
+        right: "0",
+        justifyContent: "flex-end",
       }}
       disabled={!searchQuery && newData}
     >
-      <IconSend size={14} />
+      <IconSend
+        size={30}
+        style={{
+          //border: "2px solid yellow",
+          backgroundColor: "#22d3ee",
+          opacity: "1",
+          padding: "2px",
+          borderRadius: "2px",
+        }}
+      />
     </Button>
   );
 };
@@ -190,31 +179,96 @@ const PrettifiedData = ({ data }: { data: string }) => {
     !data.includes("Secondo la documentazione") &&
     !data.includes("The documentation says")
   )
-    return <div>{data}</div>;
+    return <div className="prettified-data">{data}</div>;
+
+  const parsedData = data.replaceAll("<em>", "").replaceAll("</em>", "");
 
   return (
-    <>
-      <h2>{data.slice(0, data.indexOf(":"))}</h2>
-      <Highlighter
-        highlightClassName="YourHighlightClass"
-        textToHighlight={data.slice(data.indexOf(":") + 1)}
-        searchWords={["http", "@"]}
-        autoEscape={true}
-        //@ts-ignore
-        findChunks={findChunks}
-        highlightTag={({ children, highlightIndex }) => (
-          <Linkify>
-            <p
-              style={{
-                color: "#67e8f9",
-              }}
-            >
-              {children}
-            </p>
-          </Linkify>
-        )}
+    <div
+      style={{
+        display: "flex",
+        gap: "10px",
+      }}
+    >
+      <Avatar />
+      <div
+        className="prettified-data"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          borderRadius: "5px",
+        }}
+      >
+        <h2>{data.slice(0, data.indexOf(":"))}</h2>
+        <Highlighter
+          highlightClassName="YourHighlightClass"
+          textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
+          searchWords={["http", "@"]}
+          autoEscape={true}
+          //@ts-ignore
+          findChunks={findChunks}
+          highlightTag={({ children, highlightIndex }) => (
+            <Linkify>
+              <p
+                style={{
+                  color: "#67e8f9",
+                }}
+              >
+                {children}
+              </p>
+            </Linkify>
+          )}
+        />
+        {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
+      </div>
+    </div>
+  );
+};
+
+const CustomInput = ({
+  inputRef,
+  onSubmit,
+  searchQuery,
+  newData,
+  setSearchQuery,
+}: {
+  inputRef: React.MutableRefObject<HTMLTextAreaElement | null>;
+  onSubmit: () => any;
+  searchQuery: string;
+  newData: boolean;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        position: "absolute",
+        bottom: "10px",
+        width: "95%",
+        backgroundColor: "#71717a !important",
+        borderRadius: "2rem !important",
+        //border: "2px solid red",
+      }}
+    >
+      <Textarea
+        ref={inputRef}
+        placeholder="Search for something"
+        style={{
+          width: "90%",
+          borderRadius: "2rem !important",
+        }}
+        form="searchQueryForm"
+        className="search-query"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
-      {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
-    </>
+
+      <BtnSubmit
+        onSubmit={onSubmit}
+        searchQuery={searchQuery}
+        newData={newData}
+      />
+    </div>
   );
 };

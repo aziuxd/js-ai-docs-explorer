@@ -14,3 +14,9 @@
     padding: 2vw !important;
   }
 }
+
+.container .prettified-data {
+  background-color: #71717a !important;
+  height: fit-content;
+  padding: 1.25vw;
+}
