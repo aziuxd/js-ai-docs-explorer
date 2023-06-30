@@ -148,6 +148,7 @@ const BtnSubmit = ({
   return (
     <Button
       onClick={onSubmit}
+      className="btn-submit"
       color="#71717a "
       style={{
         display: "flex",
@@ -164,7 +165,7 @@ const BtnSubmit = ({
         size={30}
         style={{
           //border: "2px solid yellow",
-          backgroundColor: "#22d3ee",
+          backgroundColor: `${!searchQuery && newData ? "#71717a" : "#22d3ee"}`,
           opacity: "1",
           padding: "2px",
           borderRadius: "2px",
