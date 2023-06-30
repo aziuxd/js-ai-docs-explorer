@@ -201,6 +201,8 @@ const PrettifiedData = ({ data }: { data: string }) => {
       style={{
         display: "flex",
         gap: "10px",
+        maxHeight: "80vh",
+        overflowY: "auto",
       }}
     >
       <Avatar />
