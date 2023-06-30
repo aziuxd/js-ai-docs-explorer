@@ -17,7 +17,7 @@ async function start() {
     allowedHeaders: ["Authorization", "Content-Type"],
   });
 
-  app.get("/cognitive/:query", async function (req: FastifyRequest, res) {
+  app.get("/cognitive/:query", async function (req: FastifyRequest, reply) {
     try {
       //@ts-ignore
       const { query } = req.params;
@@ -43,7 +43,7 @@ async function start() {
       }
 
       //if there some cognitive search data return them
-      if (!Object.is(res, [])) return JSON.stringify({ data: res });
+      if (res.length) return JSON.stringify({ data: res });
       //if not redo the process without stemming (sometimes this can be the issue)
       else {
         results = await client.search(optimizeQuery(query, false), {
@@ -56,10 +56,13 @@ async function start() {
             res.push(curr_highlight);
           }
         }
+
+        if (!res.length) reply.status(404).send({ ok: false });
+
         return JSON.stringify({ data: res });
       }
     } catch (err) {
-      return JSON.stringify({ err });
+      return new Error(`Err: ${err}`);
     }
   });
 
