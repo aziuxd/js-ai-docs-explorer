@@ -24,7 +24,7 @@ async function start() {
         const langDetector = new LanguageDetect();
         const prob = langDetector.detect(query);
         const res = await fetch(`http://localhost:4000/cognitive/${query}`);
-        if (res.status === 404) {
+        if (!res.ok) {
           reply.status(404).send({ ok: false });
         }
         const data = await res.json();

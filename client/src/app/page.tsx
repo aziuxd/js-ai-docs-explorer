@@ -3,6 +3,7 @@ import "./styles.css";
 import { Textarea, Button } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 
 interface CustomError {
   message?: string;
@@ -14,20 +15,24 @@ export default function Home() {
   const inputRef = useRef(
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
+  const [newData, setNewData] = useState<boolean>(true);
 
   const onSubmit = async () => {
+    setNewData(false);
     try {
       if (searchQuery.length < 3)
         throw new Error("Search query should be at lest 3 chras long");
       const res = await fetch(
         `http://127.0.0.1:8000/api/AskChatGPT/${searchQuery}`
       );
+      setSearchQuery("");
       if (!res.ok) {
         throw new Error("No matches found for your query");
       }
       const data = await res.json();
 
       setQueryData(data);
+      if (data) setNewData(true);
     } catch (err) {
       const typedErr = err as CustomError;
       setQueryData(typedErr?.message as string);
@@ -87,7 +92,13 @@ export default function Home() {
             }}
             form="searchQueryForm"
             className="search-query"
-            rightSection={<BtnSubmit onSubmit={onSubmit} />}
+            rightSection={
+              <BtnSubmit
+                onSubmit={onSubmit}
+                searchQuery={searchQuery}
+                newData={newData}
+              />
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -98,13 +109,26 @@ export default function Home() {
   );
 }
 
-const BtnSubmit = ({ onSubmit }: { onSubmit: () => any }) => {
+const BtnSubmit = ({
+  onSubmit,
+  searchQuery,
+  newData,
+}: {
+  onSubmit: () => any;
+  searchQuery: string;
+  newData: boolean;
+}) => {
+  useEffect(() => {
+    console.log("cond: ", !searchQuery && newData);
+  });
+
   return (
     <Button
       onClick={onSubmit}
       style={{
         margin: 0,
       }}
+      disabled={!searchQuery && newData}
     >
       <IconSend size={14} />
     </Button>
