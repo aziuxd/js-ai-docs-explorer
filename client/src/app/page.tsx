@@ -90,6 +90,14 @@ export default function Home() {
   };
 
   useEffect(() => {
+    /*const sse = new EventSource(
+      `http://127.0.0.1:8000/api/AskChatGPT/${searchQuery}`
+    );
+
+    sse.addEventListener("message", ({ data }: { data: any }) => {
+      let msgObj = JSON.parse(data);
+      setQueryData((r) => r + msgObj.data);
+    });*/
     if (inputRef.current) {
       inputRef?.current?.focus();
     }
@@ -158,17 +166,21 @@ const BtnSubmit = ({
         position: "absolute",
         right: "0",
         justifyContent: "flex-end",
+        //border: "2px solid red",
+        padding: "1vw",
       }}
       disabled={!searchQuery && newData}
     >
       <IconSend
+        className="send-icon"
         size={30}
         style={{
           //border: "2px solid yellow",
           backgroundColor: `${!searchQuery && newData ? "#71717a" : "#22d3ee"}`,
           opacity: "1",
-          padding: "2px",
+          padding: "0",
           borderRadius: "2px",
+          //border: "2px solid yellow",
         }}
       />
     </Button>
@@ -205,7 +217,7 @@ const PrettifiedData = ({ data }: { data: string }) => {
         <Highlighter
           highlightClassName="YourHighlightClass"
           textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
-          searchWords={["http", "@"]}
+          searchWords={["http", "@", "www"]}
           autoEscape={true}
           //@ts-ignore
           findChunks={findChunks}

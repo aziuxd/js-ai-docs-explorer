@@ -20,3 +20,9 @@
   height: fit-content;
   padding: 1.25vw;
 }
+
+@media (max-width: 410px) {
+  .btn-submit {
+    padding: 0 !important;
+  }
+}

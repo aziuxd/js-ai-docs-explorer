@@ -8,6 +8,7 @@ import LanguageDetect from "languagedetect";
 import { StemmerIt, StopwordsIt } from "@nlpjs/lang-it";
 //@ts-ignore
 import { StemmerEn, StopwordsEn } from "@nlpjs/lang-en";
+import { Session, SessionState } from "better-sse";
 
 export const requestGPTCompletion = async (query: string) => {
   try {
@@ -16,23 +17,35 @@ export const requestGPTCompletion = async (query: string) => {
     });
 
     const openai = new OpenAIApi(configuration);
-
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo-16k",
-        messages: [{ role: "user", content: query }],
-      }),
+    const { data } = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo-16k",
+      messages: [{ role: "user", content: query }],
+      temperature: 0.1,
     });
 
-    const data = await res.json();
-    const completion = data.choices[0].message.content;
+    /*    //@ts-ignore
+    data.on("data", (text) => {
+      const lines = text
+        .toString()
+        .split("\n")
+        //@ts-ignore
+        .filter((line) => line.trim() !== "");
+      for (const line of lines) {
+        const message = line.replace(/^data: /, "");
+        if (message === "[DONE]") {
+          session.push("DONE", "error");
+          return;
+        }
+        try {
+          const { choices } = JSON.parse(message);
+          session.push({ text: choices[0].text });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    });*/
 
-    return completion;
+    return data.choices[0].message?.content;
   } catch (error) {
     return error;
   }
