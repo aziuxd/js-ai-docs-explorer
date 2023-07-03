@@ -26,9 +26,11 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-highlight-words": "^0.20.0",
+    "socket.io-client": "^4.7.1",
     "typescript": "5.1.6"
   },
   "devDependencies": {
-    "@types/react-highlight-words": "^0.16.4"
+    "@types/react-highlight-words": "^0.16.4",
+    "openai-streaming-hooks": "^2.0.0"
   }
 }

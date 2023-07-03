@@ -24,6 +24,8 @@ export default function RootLayout({
               styles: () => ({
                 label: {
                   backgroundColor: "#71717a !important",
+                  borderTopRightRadius: "0px !important",
+                  borderBottomRightRadius: "0 !important",
                 },
               }),
             },
@@ -31,7 +33,8 @@ export default function RootLayout({
               styles: () => ({
                 input: {
                   backgroundColor: "#71717a",
-                  borderRadius: "none",
+                  borderTopRightRadius: "0px !important",
+                  borderBottomRightRadius: "0 !important",
                   borderColor: "#71717a !important",
                 },
               }),

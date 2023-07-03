@@ -5,10 +5,14 @@ import { IconSend } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import Linkify from "linkify-react";
+import { useMediaQuery } from "@mantine/hooks";
+import { io } from "socket.io-client";
 
 interface CustomError {
   message?: string;
 }
+
+let socket: any;
 
 const findChunks = ({
   // @ts-ignore
@@ -70,19 +74,22 @@ export default function Home() {
   const onSubmit = async () => {
     setNewData(false);
     try {
-      if (searchQuery.length < 3)
+      setQueryData("");
+      socket.emit("askChatGPT", { query: searchQuery });
+      setSearchQuery("");
+      /*if (searchQuery.length < 3)
         throw new Error("Search query should be at lest 3 chras long");
       const res = await fetch(
         `http://127.0.0.1:8000/api/AskChatGPT/${searchQuery}`
       );
-      setSearchQuery("");
       if (!res.ok) {
         throw new Error("No matches found for your query");
       }
+      setSearchQuery("");
       const data = await res.json();
 
       setQueryData(data);
-      if (data) setNewData(true);
+      if (data) setNewData(true);*/
     } catch (err) {
       const typedErr = err as CustomError;
       setQueryData(typedErr?.message as string);
@@ -98,10 +105,40 @@ export default function Home() {
       let msgObj = JSON.parse(data);
       setQueryData((r) => r + msgObj.data);
     });*/
+
+    SocketHandler();
+
     if (inputRef.current) {
       inputRef?.current?.focus();
     }
-  });
+  }, []);
+
+  const SocketHandler = async () => {
+    socket = io("http://localhost:8000", {
+      forceNew: true,
+      reconnection: true,
+    });
+
+    socket.on("connect", () => {
+      console.log("connected!");
+    });
+
+    socket.on("hello", (data: any) => {
+      console.log(data);
+    });
+
+    socket.on("askChatGPTResponse", (data: any) => {
+      if (data.data && data.data !== "DONE") {
+        setQueryData((prev) => prev + data.data);
+      }
+    });
+
+    socket.on("err", (err: any) => {
+      if (err.msg === "No data") {
+        setQueryData("No matches found for your query");
+      } else setQueryData(err.msg);
+    });
+  };
 
   return (
     <main
@@ -153,6 +190,7 @@ const BtnSubmit = ({
   searchQuery: string;
   newData: boolean;
 }) => {
+  const match = useMediaQuery("(max-width: 400px)");
   return (
     <Button
       onClick={onSubmit}
@@ -168,12 +206,15 @@ const BtnSubmit = ({
         justifyContent: "flex-end",
         //border: "2px solid red",
         padding: "1vw",
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        paddingRight: match ? "10px !important" : "auto",
       }}
       disabled={!searchQuery && newData}
     >
       <IconSend
         className="send-icon"
-        size={30}
+        size={25}
         style={{
           //border: "2px solid yellow",
           backgroundColor: `${!searchQuery && newData ? "#71717a" : "#22d3ee"}`,
@@ -187,7 +228,7 @@ const BtnSubmit = ({
   );
 };
 
-const PrettifiedData = ({ data }: { data: string }) => {
+const PrettifiedData = ({ data }: { data: any }) => {
   if (
     !data.includes("Secondo la documentazione") &&
     !data.includes("The documentation says")
@@ -262,8 +303,8 @@ const CustomInput = ({
         bottom: "10px",
         width: "95%",
         backgroundColor: "#71717a !important",
-        borderRadius: "2rem !important",
-        //border: "2px solid red",
+        //borderRadius: "2rem !important",
+        border: "2px solid red",
       }}
     >
       <Textarea
@@ -272,6 +313,8 @@ const CustomInput = ({
         style={{
           width: "90%",
           borderRadius: "2rem !important",
+          borderTopRightRadius: "0px !important",
+          borderBottomRightRadius: "0 !important",
         }}
         form="searchQueryForm"
         className="search-query"
