@@ -1,55 +1,10 @@
 import * as dotenv from "dotenv";
 dotenv.config();
-import { Configuration, OpenAIApi } from "openai";
-import fetch from "node-fetch";
-import { enStoppingWords, itStoppingWords } from "./globals";
 import LanguageDetect from "languagedetect";
 //@ts-ignore
 import { StemmerIt, StopwordsIt } from "@nlpjs/lang-it";
 //@ts-ignore
 import { StemmerEn, StopwordsEn } from "@nlpjs/lang-en";
-import { Session, SessionState } from "better-sse";
-
-export const requestGPTCompletion = async (query: string) => {
-  try {
-    const configuration = new Configuration({
-      apiKey: process.env.OPENAI_KEY,
-    });
-
-    const openai = new OpenAIApi(configuration);
-    const { data } = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo-16k",
-      messages: [{ role: "user", content: query }],
-      temperature: 0.1,
-    });
-
-    /*    //@ts-ignore
-    data.on("data", (text) => {
-      const lines = text
-        .toString()
-        .split("\n")
-        //@ts-ignore
-        .filter((line) => line.trim() !== "");
-      for (const line of lines) {
-        const message = line.replace(/^data: /, "");
-        if (message === "[DONE]") {
-          session.push("DONE", "error");
-          return;
-        }
-        try {
-          const { choices } = JSON.parse(message);
-          session.push({ text: choices[0].text });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    });*/
-
-    return data.choices[0].message?.content;
-  } catch (error) {
-    return error;
-  }
-};
 
 //takes the natural language query and remove all stopping words
 //OLD FUNCTION

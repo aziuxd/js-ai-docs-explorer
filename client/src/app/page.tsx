@@ -358,9 +358,6 @@ const BtnRegenerateRes = ({
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  useEffect(() => {
-    console.log(originalQuery);
-  });
   return (
     <div
       style={{
