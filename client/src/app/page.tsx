@@ -346,7 +346,7 @@ const CustomInput = ({
     >
       <Textarea
         ref={inputRef}
-        placeholder="Search for something"
+        placeholder="Search for something in the documentation"
         style={{
           width: "90%",
           borderRadius: "2rem !important",
