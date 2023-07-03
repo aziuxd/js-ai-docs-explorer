@@ -5,8 +5,10 @@ import {
   IconSend,
   IconError404,
   IconExclamationCircle,
+  IconClipboard,
+  IconClipboardCheck,
 } from "@tabler/icons-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import Highlighter from "react-highlight-words";
 import Linkify from "linkify-react";
 import { useMediaQuery } from "@mantine/hooks";
@@ -76,8 +78,10 @@ export default function Home() {
   const [newData, setNewData] = useState<boolean>(true);
   const [originalQuery, setOriginalQuery] = useState<string>(searchQuery);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [areDataCopied, setAreDataCopied] = useState<boolean>(false);
 
   const onSubmit = async () => {
+    setAreDataCopied(false);
     setNewData(true);
     setOriginalQuery(searchQuery);
     setIsLoading(true);
@@ -165,7 +169,10 @@ export default function Home() {
             newData={newData}
             originalQuery={originalQuery}
             setQueryData={setQueryData}
+            isLoading={isLoading}
             setIsLoading={setIsLoading}
+            areDataCopied={areDataCopied}
+            setAreDataCopied={setAreDataCopied}
           />
         ) : (
           ""
@@ -237,13 +244,19 @@ const PrettifiedData = ({
   newData,
   originalQuery,
   setQueryData,
+  isLoading,
   setIsLoading,
+  areDataCopied,
+  setAreDataCopied,
 }: {
   data: string;
   newData: boolean;
   originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  areDataCopied: boolean;
+  setAreDataCopied: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   if (
     !data?.includes("Secondo la documentazione") &&
@@ -289,7 +302,32 @@ const PrettifiedData = ({
             borderRadius: "5px",
           }}
         >
-          <h2>{data.slice(0, data.indexOf(":"))}</h2>
+          <div
+            className="header"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <h2>{data.slice(0, data.indexOf(":"))}</h2>
+            {!newData && data ? (
+              areDataCopied ? (
+                <IconClipboardCheck />
+              ) : (
+                <IconClipboard
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(data);
+                    setAreDataCopied(true);
+                  }}
+                />
+              )
+            ) : (
+              ""
+            )}
+          </div>
           <Highlighter
             highlightClassName="YourHighlightClass"
             textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
@@ -317,6 +355,7 @@ const PrettifiedData = ({
           originalQuery={originalQuery}
           setQueryData={setQueryData}
           setIsLoading={setIsLoading}
+          setAreDataCopied={setAreDataCopied}
         />
       )}
     </div>
@@ -376,10 +415,12 @@ const BtnRegenerateRes = ({
   originalQuery,
   setQueryData,
   setIsLoading,
+  setAreDataCopied,
 }: {
   originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setAreDataCopied: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <div
@@ -393,6 +434,7 @@ const BtnRegenerateRes = ({
       <Button
         onClick={() => {
           setQueryData("");
+          setAreDataCopied(false);
           setIsLoading(true);
           socket?.emit("askChatGPT", { query: originalQuery });
         }}
