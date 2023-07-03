@@ -249,7 +249,19 @@ const PrettifiedData = ({
     !data.includes("Secondo la documentazione") &&
     !data.includes("The documentation says")
   )
-    return (
+    return data.includes("No matches found for your query") ? (
+      <div
+        className="prettified-data"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <IconError404 size={60} />
+        <p>{data}</p>
+      </div>
+    ) : (
       <div
         className="prettified-data"
         style={{
