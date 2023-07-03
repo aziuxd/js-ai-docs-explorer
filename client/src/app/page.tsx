@@ -72,24 +72,13 @@ export default function Home() {
   const [newData, setNewData] = useState<boolean>(true);
 
   const onSubmit = async () => {
-    setNewData(false);
+    setNewData(true);
     try {
+      if (searchQuery.length < 3)
+        throw new Error("Search query should be at lest 3 chras long");
       setQueryData("");
       socket.emit("askChatGPT", { query: searchQuery });
       setSearchQuery("");
-      /*if (searchQuery.length < 3)
-        throw new Error("Search query should be at lest 3 chras long");
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/AskChatGPT/${searchQuery}`
-      );
-      if (!res.ok) {
-        throw new Error("No matches found for your query");
-      }
-      setSearchQuery("");
-      const data = await res.json();
-
-      setQueryData(data);
-      if (data) setNewData(true);*/
     } catch (err) {
       const typedErr = err as CustomError;
       setQueryData(typedErr?.message as string);
@@ -97,15 +86,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    /*const sse = new EventSource(
-      `http://127.0.0.1:8000/api/AskChatGPT/${searchQuery}`
-    );
-
-    sse.addEventListener("message", ({ data }: { data: any }) => {
-      let msgObj = JSON.parse(data);
-      setQueryData((r) => r + msgObj.data);
-    });*/
-
     SocketHandler();
 
     if (inputRef.current) {
@@ -123,12 +103,10 @@ export default function Home() {
       console.log("connected!");
     });
 
-    socket.on("hello", (data: any) => {
-      console.log(data);
-    });
-
     socket.on("askChatGPTResponse", (data: any) => {
+      if (data.data === "DONE") setNewData(false);
       if (data.data && data.data !== "DONE") {
+        setNewData(true);
         setQueryData((prev) => prev + data.data);
       }
     });
@@ -304,7 +282,7 @@ const CustomInput = ({
         width: "95%",
         backgroundColor: "#71717a !important",
         //borderRadius: "2rem !important",
-        border: "2px solid red",
+        //border: "2px solid red",
       }}
     >
       <Textarea
