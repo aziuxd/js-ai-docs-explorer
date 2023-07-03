@@ -32,7 +32,7 @@
 .container .prettified-data {
   background-color: #71717a !important;
   height: fit-content;
-  padding: 1.25vw;
+  padding: 2vw;
 }
 
 @media (max-width: 410px) {
