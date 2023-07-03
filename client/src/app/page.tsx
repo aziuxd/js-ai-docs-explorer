@@ -214,7 +214,7 @@ const BtnSubmit = ({
         style={{
           //border: "2px solid yellow",
           cursor: "pointer",
-          backgroundColor: `${!searchQuery && newData ? "#71717a" : "#22d3ee"}`,
+          backgroundColor: `${!searchQuery && newData ? "#71717a" : "#228BE6"}`,
           opacity: "1",
           padding: "0",
           borderRadius: "2px",
