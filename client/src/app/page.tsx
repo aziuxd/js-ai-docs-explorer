@@ -1,6 +1,6 @@
 "use client";
 import "./styles.css";
-import { Textarea, Button, Avatar } from "@mantine/core";
+import { Textarea, Button, Avatar, Loader } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
@@ -71,10 +71,12 @@ export default function Home() {
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
   const [newData, setNewData] = useState<boolean>(true);
   const [originalQuery, setOriginalQuery] = useState<string>(searchQuery);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async () => {
     setNewData(true);
     setOriginalQuery(searchQuery);
+    setIsLoading(true);
     try {
       if (searchQuery.length < 3)
         throw new Error("Search query should be at lest 3 chras long");
@@ -106,6 +108,7 @@ export default function Home() {
     });
 
     socket.on("askChatGPTResponse", (data: any) => {
+      setIsLoading(false);
       if (data.data === "DONE") setNewData(false);
       if (data.data && data.data !== "DONE") {
         setNewData(true);
@@ -147,12 +150,15 @@ export default function Home() {
           position: "relative",
         }}
       >
-        {queryData ? (
+        {isLoading ? (
+          <LoadingScreen />
+        ) : queryData ? (
           <PrettifiedData
             data={queryData}
             newData={newData}
             originalQuery={originalQuery}
             setQueryData={setQueryData}
+            setIsLoading={setIsLoading}
           />
         ) : (
           ""
@@ -224,11 +230,13 @@ const PrettifiedData = ({
   newData,
   originalQuery,
   setQueryData,
+  setIsLoading,
 }: {
   data: string;
   newData: boolean;
   originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   if (
     !data.includes("Secondo la documentazione") &&
@@ -285,6 +293,7 @@ const PrettifiedData = ({
         <BtnRegenerateRes
           originalQuery={originalQuery}
           setQueryData={setQueryData}
+          setIsLoading={setIsLoading}
         />
       )}
     </div>
@@ -343,9 +352,11 @@ const CustomInput = ({
 const BtnRegenerateRes = ({
   originalQuery,
   setQueryData,
+  setIsLoading,
 }: {
   originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   useEffect(() => {
     console.log(originalQuery);
@@ -362,11 +373,30 @@ const BtnRegenerateRes = ({
       <Button
         onClick={() => {
           setQueryData("");
+          setIsLoading(true);
           socket?.emit("askChatGPT", { query: originalQuery });
         }}
       >
         Regenerate response
       </Button>
+    </div>
+  );
+};
+
+const LoadingScreen = () => {
+  return (
+    <div
+      className="loading-screen"
+      style={{
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        zIndex: 100,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Loader variant="dots" color="white" />
     </div>
   );
 };
