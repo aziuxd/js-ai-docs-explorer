@@ -246,10 +246,10 @@ const PrettifiedData = ({
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   if (
-    !data.includes("Secondo la documentazione") &&
-    !data.includes("The documentation says")
+    !data?.includes("Secondo la documentazione") &&
+    !data?.includes("The documentation says")
   )
-    return data.includes("No matches found for your query") ? (
+    return data?.includes("No matches found for your query") ? (
       <div
         className="prettified-data"
         style={{
