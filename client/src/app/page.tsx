@@ -249,7 +249,7 @@ const PrettifiedData = ({
     !data?.includes("Secondo la documentazione") &&
     !data?.includes("The documentation says")
   )
-    return data?.includes("No matches found for your query") ? (
+    return (
       <div
         className="prettified-data"
         style={{
@@ -258,23 +258,14 @@ const PrettifiedData = ({
           alignItems: "center",
         }}
       >
-        <IconError404 size={60} />
-        <p>{data}</p>
-      </div>
-    ) : (
-      <div
-        className="prettified-data"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <IconExclamationCircle size={60} />
+        {data?.includes("No matches found for your query") ? (
+          <IconError404 size={60} />
+        ) : (
+          <IconExclamationCircle size={60} />
+        )}
         <p>{data}</p>
       </div>
     );
-
   const parsedData = data.replaceAll("<em>", "").replaceAll("</em>", "");
 
   return (
