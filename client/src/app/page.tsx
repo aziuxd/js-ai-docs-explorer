@@ -70,9 +70,11 @@ export default function Home() {
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
   const [newData, setNewData] = useState<boolean>(true);
+  const [originalQuery, setOriginalQuery] = useState<string>(searchQuery);
 
   const onSubmit = async () => {
     setNewData(true);
+    setOriginalQuery(searchQuery);
     try {
       if (searchQuery.length < 3)
         throw new Error("Search query should be at lest 3 chras long");
@@ -145,7 +147,16 @@ export default function Home() {
           position: "relative",
         }}
       >
-        {queryData ? <PrettifiedData data={queryData} /> : ""}
+        {queryData ? (
+          <PrettifiedData
+            data={queryData}
+            newData={newData}
+            originalQuery={originalQuery}
+            setQueryData={setQueryData}
+          />
+        ) : (
+          ""
+        )}
         <CustomInput
           inputRef={inputRef}
           searchQuery={searchQuery}
@@ -171,7 +182,6 @@ const BtnSubmit = ({
   const match = useMediaQuery("(max-width: 400px)");
   return (
     <Button
-      onClick={onSubmit}
       className="btn-submit"
       color="#71717a "
       style={{
@@ -187,14 +197,17 @@ const BtnSubmit = ({
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
         paddingRight: match ? "10px !important" : "auto",
+        cursor: "auto",
       }}
       disabled={!searchQuery && newData}
     >
       <IconSend
+        onClick={onSubmit}
         className="send-icon"
         size={25}
         style={{
           //border: "2px solid yellow",
+          cursor: "pointer",
           backgroundColor: `${!searchQuery && newData ? "#71717a" : "#22d3ee"}`,
           opacity: "1",
           padding: "0",
@@ -206,7 +219,17 @@ const BtnSubmit = ({
   );
 };
 
-const PrettifiedData = ({ data }: { data: any }) => {
+const PrettifiedData = ({
+  data,
+  newData,
+  originalQuery,
+  setQueryData,
+}: {
+  data: string;
+  newData: boolean;
+  originalQuery: string;
+  setQueryData: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   if (
     !data.includes("Secondo la documentazione") &&
     !data.includes("The documentation says")
@@ -216,46 +239,54 @@ const PrettifiedData = ({ data }: { data: any }) => {
   const parsedData = data.replaceAll("<em>", "").replaceAll("</em>", "");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "10px",
-        maxHeight: "80vh",
-        overflowY: "auto",
-      }}
-    >
-      <Avatar />
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
       <div
-        className="prettified-data"
         style={{
           display: "flex",
-          flexDirection: "column",
           gap: "10px",
-          borderRadius: "5px",
+          maxHeight: "80vh",
+          overflowY: "auto",
         }}
       >
-        <h2>{data.slice(0, data.indexOf(":"))}</h2>
-        <Highlighter
-          highlightClassName="YourHighlightClass"
-          textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
-          searchWords={["http", "@", "www"]}
-          autoEscape={true}
-          //@ts-ignore
-          findChunks={findChunks}
-          highlightTag={({ children, highlightIndex }) => (
-            <Linkify>
-              <p
-                style={{
-                  color: "#67e8f9",
-                }}
-              >
-                {children}
-              </p>
-            </Linkify>
-          )}
-        />
-        {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
+        <Avatar />
+        <div
+          className="prettified-data"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            borderRadius: "5px",
+          }}
+        >
+          <h2>{data.slice(0, data.indexOf(":"))}</h2>
+          <Highlighter
+            highlightClassName="YourHighlightClass"
+            textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
+            searchWords={["http", "@", "www"]}
+            autoEscape={true}
+            //@ts-ignore
+            findChunks={findChunks}
+            highlightTag={({ children, highlightIndex }) => (
+              <Linkify>
+                <p
+                  style={{
+                    color: "#67e8f9",
+                  }}
+                >
+                  {children}
+                </p>
+              </Linkify>
+            )}
+          />
+          {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
+        </div>
       </div>
+      {!newData && data && (
+        <BtnRegenerateRes
+          originalQuery={originalQuery}
+          setQueryData={setQueryData}
+        />
+      )}
     </div>
   );
 };
@@ -305,6 +336,37 @@ const CustomInput = ({
         searchQuery={searchQuery}
         newData={newData}
       />
+    </div>
+  );
+};
+
+const BtnRegenerateRes = ({
+  originalQuery,
+  setQueryData,
+}: {
+  originalQuery: string;
+  setQueryData: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  useEffect(() => {
+    console.log(originalQuery);
+  });
+  return (
+    <div
+      style={{
+        width: "100%",
+        //border: "2px solid red",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <Button
+        onClick={() => {
+          setQueryData("");
+          socket?.emit("askChatGPT", { query: originalQuery });
+        }}
+      >
+        Regenerate response
+      </Button>
     </div>
   );
 };
