@@ -78,8 +78,10 @@ export default function Home() {
     setOriginalQuery(searchQuery);
     setIsLoading(true);
     try {
-      if (searchQuery.length < 3)
-        throw new Error("Search query should be at lest 3 chras long");
+      if (searchQuery.length < 3) {
+        setIsLoading(false);
+        throw new Error("Search query should be at lest 3 char long");
+      }
       setQueryData("");
       socket.emit("askChatGPT", { query: searchQuery });
       setSearchQuery("");
@@ -117,6 +119,7 @@ export default function Home() {
     });
 
     socket.on("err", (err: any) => {
+      setIsLoading(false);
       if (err.msg === "No data") {
         setQueryData("No matches found for your query");
       } else setQueryData(err.msg);
