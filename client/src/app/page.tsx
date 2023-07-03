@@ -256,6 +256,7 @@ const PrettifiedData = ({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          borderRadius: "5px",
         }}
       >
         {data?.includes("No matches found for your query") ? (
