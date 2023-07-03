@@ -1,7 +1,11 @@
 "use client";
 import "./styles.css";
 import { Textarea, Button, Avatar, Loader } from "@mantine/core";
-import { IconSend } from "@tabler/icons-react";
+import {
+  IconSend,
+  IconError404,
+  IconExclamationCircle,
+} from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import Linkify from "linkify-react";
@@ -245,7 +249,19 @@ const PrettifiedData = ({
     !data.includes("Secondo la documentazione") &&
     !data.includes("The documentation says")
   )
-    return <div className="prettified-data">{data}</div>;
+    return (
+      <div
+        className="prettified-data"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <IconExclamationCircle size={60} />
+        <p>{data}</p>
+      </div>
+    );
 
   const parsedData = data.replaceAll("<em>", "").replaceAll("</em>", "");
 
