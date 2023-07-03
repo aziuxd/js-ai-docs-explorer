@@ -391,7 +391,7 @@ const LoadingScreen = () => {
         zIndex: 100,
         justifyContent: "center",
         alignItems: "center",
-        border: "2px solid red",
+        //border: "2px solid red",
       }}
     >
       <Loader variant="dots" color="white" />
