@@ -10,6 +10,7 @@
 
   .btn-submit {
     padding: 2vw;
+    justify-content: center !important;
   }
 }
 
