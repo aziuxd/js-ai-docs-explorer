@@ -1,6 +1,14 @@
 "use client";
 import "./styles.css";
-import { AppShell, Burger, Header, MediaQuery, Navbar } from "@mantine/core";
+import {
+  AppShell,
+  Burger,
+  Header,
+  MediaQuery,
+  Navbar,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useRef, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useSettingsStore, useUiStore } from "../../lib/store";
@@ -30,7 +38,6 @@ export default function Page() {
     setOriginalQuery,
     setIsLoading,
     originalQuery,
-    newData,
   } = useUiStore();
   const { model, temperature } = useSettingsStore();
 
@@ -50,15 +57,6 @@ export default function Page() {
       setOriginalQuery(searchQuery);
     }
     try {
-      if (
-        variant === "submit"
-          ? searchQuery.length < 3
-          : queryDataArr[idx as number].originalQuery.length < 3
-      ) {
-        setIsLoading(false);
-        throw new Error("Search query should be at lest 3 char long");
-      }
-
       if (variant === "regenerate" && typeof idx === "number" && idx >= 0) {
         socket.emit("askChatGPT", {
           query: queryDataArr[idx].originalQuery,
@@ -134,6 +132,27 @@ export default function Page() {
 
     socket.on("err", (err: any) => {
       setIsLoading(false);
+      updateQueryDataArr((draft) => {
+        if (draft.length === 0) {
+          draft.push({
+            originalQuery,
+            content:
+              err.msg === "No data"
+                ? "No matches found for your query"
+                : err.msg,
+          });
+        } else {
+          draft[draft.length - 1] = {
+            originalQuery,
+            content:
+              err.msg === "No data"
+                ? "No matches found for your query"
+                : err.msg,
+          };
+        }
+
+        draft.push({});
+      });
       if (err.msg === "No data") {
         setQueryData("No matches found for your query");
       } else setQueryData(err.msg);
@@ -144,7 +163,7 @@ export default function Page() {
     <AppShell
       styles={{
         main: {
-          background: "#a1a1aa",
+          background: "white",
           overflowY: "auto",
         },
       }}
@@ -157,7 +176,7 @@ export default function Page() {
           hidden={!opened}
           width={{ sm: 200, lg: 300 }}
           style={{
-            backgroundColor: "#868E96",
+            backgroundColor: "#228BE6",
             borderRight: "1px solid black",
           }}
         >
@@ -182,7 +201,7 @@ export default function Page() {
           height={{ base: 50, md: 70 }}
           p="md"
           style={{
-            backgroundColor: "#868E96",
+            backgroundColor: "#228BE6",
             //border: "#868E96",
             borderBottom: "1px solid black",
           }}
@@ -203,6 +222,16 @@ export default function Page() {
                 mr="xl"
               />
             </MediaQuery>
+
+            <h2
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              Silwa AI docs explorer
+            </h2>
           </div>
         </Header>
       }
@@ -219,7 +248,7 @@ export default function Page() {
           padding: "20px",
           paddingTop: "40px",
           //backgroundColor: "#9ca3af",
-          backgroundColor: "#a1a1aa",
+          backgroundColor: "white",
           position: "relative",
         }}
       >

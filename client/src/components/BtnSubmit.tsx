@@ -34,7 +34,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
         paddingRight: match ? "10px !important" : "auto",
         cursor: "auto",
       }}
-      disabled={!searchQuery && newData}
+      disabled={searchQuery === "" && newData}
     >
       <IconSend
         onClick={() => onSubmit()}

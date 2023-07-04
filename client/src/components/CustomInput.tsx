@@ -63,6 +63,16 @@ export const CustomInput: React.FC<CustomInputProps> = ({
         className="search-query"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (e.shiftKey) {
+              setSearchQuery((prev) => (prev + "\\").replace("\\", ""));
+            } else {
+              onSubmit();
+              return;
+            }
+          }
+        }}
       />
 
       <BtnSubmit onSubmit={onSubmit} searchQuery={searchQuery} />

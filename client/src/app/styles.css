@@ -37,7 +37,7 @@
 }
 
 .container .prettified-data {
-  background-color: #71717a !important;
+  background-color: #228be6 !important;
   height: fit-content;
   padding: 2vw;
 }
@@ -50,5 +50,5 @@
 
 .model-input:focus-visible,
 .index-input:focus-visible {
-  outline: 2px solid #339af0;
+  outline: 2px solid black;
 }

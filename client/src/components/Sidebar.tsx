@@ -64,6 +64,20 @@ export const Sidebar = () => {
           markLabel: {
             color: "black",
           },
+          thumb: {
+            color: "black",
+            borderColor: "black",
+          },
+          bar: {
+            color: "black",
+            backgroundColor: "black",
+          },
+          dragging: {
+            color: "black",
+          },
+          markFilled: {
+            borderColor: "black",
+          },
         }}
       />
       <Select
