@@ -43,7 +43,7 @@ export default function RootLayout({
             InputWrapper: {
               styles: () => ({
                 label: {
-                  backgroundColor: "#868E96 !important",
+                  backgroundColor: "#228BE6 !important",
                   borderTopRightRadius: "0px !important",
                   borderBottomRightRadius: "0 !important",
                 },

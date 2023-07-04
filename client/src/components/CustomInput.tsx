@@ -39,7 +39,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           ? `${(width as number) - 300}px`
           : `${(width as number) - 200}px`,
         //backgroundColor: "#71717a !important",
-        backgroundColor: "#868E96",
+        backgroundColor: "#4dabf7",
         //borderRadius: "2rem !important",
         //border: "2px solid red",
       }}
@@ -57,6 +57,8 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           input: {
             borderTopRightRadius: "0px !important",
             borderBottomRightRadius: "0 !important",
+            backgroundColor: "#4dabf7",
+            borderColor: "#4dabf7 !important",
           },
         }}
         form="searchQueryForm"

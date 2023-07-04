@@ -23,7 +23,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
         display: "flex",
         width: "10%",
         height: "100%",
-        backgroundColor: "#868E96 !important",
+        backgroundColor: "#4dabf7 !important",
         position: "absolute",
         right: "0",
         justifyContent: "flex-end",
@@ -43,7 +43,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
         style={{
           //border: "2px solid yellow",
           cursor: "pointer",
-          backgroundColor: `${!searchQuery && newData ? "#868E96" : "#228BE6"}`,
+          backgroundColor: `${!searchQuery && newData ? "#4dabf7" : "#228BE6"}`,
           opacity: "1",
           padding: "0",
           borderRadius: "2px",
