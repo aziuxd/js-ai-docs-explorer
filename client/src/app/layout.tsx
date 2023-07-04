@@ -1,7 +1,7 @@
 "use client";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, rem } from "@mantine/core";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,12 +18,32 @@ export default function RootLayout({
   return (
     <html lang="en">
       <MantineProvider
+        withNormalizeCSS
+        withGlobalStyles
         theme={{
+          /*focusRingStyles: {
+            // reset styles are applied to <button /> and <a /> elements
+            // in &:focus:not(:focus-visible) selector to mimic
+            // default browser behavior for native <button /> and <a /> elements
+            resetStyles: () => ({ outline: "none" }),
+
+            // styles applied to all elements except inputs based on Input component
+            // styled are added with &:focus selector
+            styles: (theme) => ({
+              outline: `${rem(2)} solid ${theme.colors.orange[5]}`,
+            }),
+
+            // focus styles applied to components that are based on Input
+            // styled are added with &:focus selector
+            inputStyles: (theme) => ({
+              outline: `${rem(2)} solid ${theme.colors.orange[5]}`,
+            }),
+          },*/
           components: {
             InputWrapper: {
               styles: () => ({
                 label: {
-                  backgroundColor: "#71717a !important",
+                  backgroundColor: "#868E96 !important",
                   borderTopRightRadius: "0px !important",
                   borderBottomRightRadius: "0 !important",
                 },
@@ -32,10 +52,8 @@ export default function RootLayout({
             Input: {
               styles: () => ({
                 input: {
-                  backgroundColor: "#71717a",
-                  borderTopRightRadius: "0px !important",
-                  borderBottomRightRadius: "0 !important",
-                  borderColor: "#71717a !important",
+                  backgroundColor: "#868E96",
+                  borderColor: "#868E96 !important",
                 },
               }),
             },
