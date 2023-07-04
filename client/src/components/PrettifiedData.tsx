@@ -12,8 +12,14 @@ import { useUiStore } from "../../lib/store";
 import { BtnRegenerateRes } from "./BtnRegenerateRes";
 
 interface PrettifiedDataProps {
-  data: string;
+  data: Data;
   onBtnEvent: () => any;
+  id: number;
+}
+
+interface Data {
+  content: string;
+  originalQuery: string;
 }
 
 const findChunks = ({
@@ -68,11 +74,16 @@ const findChunks = ({
 export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
   data,
   onBtnEvent,
+  id,
 }) => {
   const { newData, areDataCopied, setAreDataCopied } = useUiStore();
+  const { content, originalQuery } = data;
+  if (!content) {
+    return "";
+  }
   if (
-    !data?.includes("Secondo la documentazione") &&
-    !data?.includes("The documentation says")
+    !content?.includes("Secondo la documentazione") &&
+    !content?.includes("The documentation says")
   )
     return (
       <div
@@ -84,15 +95,15 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
           borderRadius: "5px",
         }}
       >
-        {data?.includes("No matches found for your query") ? (
+        {data?.content?.includes("No matches found for your query") ? (
           <IconError404 size={60} />
         ) : (
           <IconExclamationCircle size={60} />
         )}
-        <p>{data}</p>
+        <p>{data?.content}</p>
       </div>
     );
-  const parsedData = data.replaceAll("<em>", "").replaceAll("</em>", "");
+  const parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -121,7 +132,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
               justifyContent: "space-between",
             }}
           >
-            <h2>{data.slice(0, data.indexOf(":"))}</h2>
+            <h2>{content?.slice(0, content?.indexOf(":"))}</h2>
             {!newData && data ? (
               areDataCopied ? (
                 <IconClipboardCheck />
@@ -131,7 +142,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
                     cursor: "pointer",
                   }}
                   onClick={() => {
-                    navigator.clipboard.writeText(data);
+                    navigator.clipboard.writeText(content);
                     setAreDataCopied(true);
                   }}
                 />
@@ -162,7 +173,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
           {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
         </div>
       </div>
-      {!newData && data && <BtnRegenerateRes onBtnEvent={onBtnEvent} />}
+      {!newData && data && <BtnRegenerateRes onBtnEvent={onBtnEvent} id={id} />}
     </div>
   );
 };

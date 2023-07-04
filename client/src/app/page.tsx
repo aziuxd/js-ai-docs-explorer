@@ -1,13 +1,6 @@
 "use client";
 import "./styles.css";
-import {
-  AppShell,
-  Burger,
-  Header,
-  MediaQuery,
-  Navbar,
-  Text,
-} from "@mantine/core";
+import { AppShell, Burger, Header, MediaQuery, Navbar } from "@mantine/core";
 import { useRef, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useSettingsStore, useUiStore } from "../../lib/store";
@@ -15,6 +8,7 @@ import { CustomInput } from "@/components/CustomInput";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { PrettifiedData } from "@/components/PrettifiedData";
 import { Sidebar } from "@/components/Sidebar";
+import { useImmer } from "use-immer";
 
 interface CustomError {
   message?: string;
@@ -24,7 +18,9 @@ let socket: any;
 export default function Page() {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [queryData, setQueryData] = useState<string>("");
+  const [_, setQueryData] = useState<string>("");
+  const [queryDataArr, updateQueryDataArr] = useImmer<any[]>([]);
+
   const inputRef = useRef(
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -34,21 +30,51 @@ export default function Page() {
     setOriginalQuery,
     setAreDataCopied,
     setIsLoading,
+    originalQuery,
+    newData,
   } = useUiStore();
   const { model, temperature } = useSettingsStore();
 
-  const onBtnEvent = async (variant: "submit" | "regenerate" = "submit") => {
+  const onBtnEvent = async (
+    variant: "submit" | "regenerate" = "submit",
+    idx?: number
+  ) => {
     setAreDataCopied(false);
     if (variant === "submit") setNewData(true);
     setQueryData("");
+    if (variant === "regenerate" && typeof idx === "number" && idx >= 0)
+      updateQueryDataArr((draft) => {
+        draft[idx].content = "";
+      });
+
     setIsLoading(true);
-    if (variant === "submit") setOriginalQuery(searchQuery);
+    if (variant === "submit") {
+      setOriginalQuery(searchQuery);
+    }
     try {
-      if (searchQuery.length < 3) {
+      if (
+        variant === "submit"
+          ? searchQuery.length < 3
+          : queryDataArr[idx as number].originalQuery.length < 3
+      ) {
         setIsLoading(false);
         throw new Error("Search query should be at lest 3 char long");
       }
-      socket.emit("askChatGPT", { query: searchQuery, model, temperature });
+
+      if (variant === "regenerate" && typeof idx === "number" && idx >= 0) {
+        socket.emit("askChatGPT", {
+          query: queryDataArr[idx].originalQuery,
+          model,
+          temperature,
+          idx,
+        });
+      } else
+        socket.emit("askChatGPT", {
+          query: searchQuery,
+          model,
+          temperature,
+        });
+
       if (variant === "submit") setSearchQuery("");
     } catch (err) {
       const typedErr = err as CustomError;
@@ -76,10 +102,53 @@ export default function Page() {
 
     socket.on("askChatGPTResponse", (data: any) => {
       setIsLoading(false);
-      if (data.data === "DONE") setNewData(false);
+      if (data.data === "DONE") {
+        setNewData(false);
+        updateQueryDataArr((draft) => {
+          draft.push({});
+        });
+      }
       if (data.data && data.data !== "DONE") {
+        setQueryData((prev) => {
+          updateQueryDataArr((draft) => {
+            const i = data.idx ? data.idx : draft.length - 1;
+            if (!prev) {
+              if (Object.is(draft[i], {})) {
+                draft[i] = {
+                  originalQuery: data.originalQuery,
+                  content: data.data,
+                };
+              } else
+                draft.push({
+                  originalQuery: data.originalQuery,
+                  content: data.data,
+                });
+            } else {
+              draft[i].content = prev + data.data;
+            }
+          });
+          return prev + data.data;
+        });
+
         setNewData(true);
-        setQueryData((prev) => prev + data.data);
+        /*setQueryData((prev) => {
+          !prev
+            ? setQueryDataArr([
+                ...queryDataArr,
+                {
+                  content: data.data,
+                  originalQuery,
+                },
+              ])
+            : setQueryDataArr([
+                ...queryDataArr,
+                {
+                  content: prev + data.data,
+                  originalQuery,
+                },
+              ]);
+          return prev + data.data;
+        });*/
       }
     });
 
@@ -176,8 +245,19 @@ export default function Page() {
       >
         {isLoading ? (
           <LoadingScreen />
-        ) : queryData ? (
-          <PrettifiedData data={queryData} onBtnEvent={onBtnEvent} />
+        ) : queryDataArr.length !== 0 ? (
+          queryDataArr.map((currData, idx) => {
+            return Object.is(currData, {}) ? (
+              ""
+            ) : (
+              <PrettifiedData
+                data={currData}
+                onBtnEvent={onBtnEvent}
+                id={idx}
+                key={idx}
+              />
+            );
+          })
         ) : (
           ""
         )}

@@ -37,7 +37,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
       disabled={!searchQuery && newData}
     >
       <IconSend
-        onClick={onSubmit}
+        onClick={() => onSubmit()}
         className="send-icon"
         size={25}
         style={{

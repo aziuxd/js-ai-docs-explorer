@@ -20,9 +20,8 @@ const openai = new OpenAIApi(config);
 
 io.on("connection", (socket) => {
   socket.on("askChatGPT", async (data) => {
-    const { query, temperature, model } = data;
-    console.log("temp: ", temperature);
-    console.log("model: ", model);
+    const { query, temperature, model, idx } = data;
+    console.log(idx);
     try {
       if (typeof query !== "string" || query === "") {
         socket.emit("err", { msg: "Not valid query" });
@@ -58,6 +57,8 @@ io.on("connection", (socket) => {
               ? "Secondo la documentazione: "
               : "The documentation says: "
           }`,
+          originalQuery: query,
+          idx,
         });
 
         //@ts-ignore
