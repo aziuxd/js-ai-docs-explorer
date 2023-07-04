@@ -10,10 +10,11 @@ import Linkify from "linkify-react";
 import Highlighter from "react-highlight-words";
 import { useUiStore } from "../../lib/store";
 import { BtnRegenerateRes } from "./BtnRegenerateRes";
+import { useState } from "react";
 
 interface PrettifiedDataProps {
   data: Data;
-  onBtnEvent: () => any;
+  onBtnEvent: (variant: "submit" | "regenerate", idx: number) => any;
   id: number;
 }
 
@@ -76,8 +77,9 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
   onBtnEvent,
   id,
 }) => {
-  const { newData, areDataCopied, setAreDataCopied } = useUiStore();
-  const { content, originalQuery } = data;
+  const { newData } = useUiStore();
+  const [areDataCopied, setAreDataCopied] = useState<boolean>(false);
+  const { content } = data;
   if (!content) {
     return "";
   }
@@ -104,6 +106,10 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
       </div>
     );
   const parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
+  const onRegenerate = () => {
+    onBtnEvent("regenerate", id);
+    setAreDataCopied(false);
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -135,7 +141,15 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
             <h2>{content?.slice(0, content?.indexOf(":"))}</h2>
             {!newData && data ? (
               areDataCopied ? (
-                <IconClipboardCheck />
+                <IconClipboardCheck
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(content);
+                    setAreDataCopied(true);
+                  }}
+                />
               ) : (
                 <IconClipboard
                   style={{
@@ -173,7 +187,9 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
           {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
         </div>
       </div>
-      {!newData && data && <BtnRegenerateRes onBtnEvent={onBtnEvent} id={id} />}
+      {!newData && data && (
+        <BtnRegenerateRes onBtnEvent={onRegenerate} id={id} />
+      )}
     </div>
   );
 };

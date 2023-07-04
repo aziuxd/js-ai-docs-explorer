@@ -28,7 +28,6 @@ export default function Page() {
     isLoading,
     setNewData,
     setOriginalQuery,
-    setAreDataCopied,
     setIsLoading,
     originalQuery,
     newData,
@@ -39,7 +38,6 @@ export default function Page() {
     variant: "submit" | "regenerate" = "submit",
     idx?: number
   ) => {
-    setAreDataCopied(false);
     if (variant === "submit") setNewData(true);
     setQueryData("");
     if (variant === "regenerate" && typeof idx === "number" && idx >= 0)
@@ -131,24 +129,6 @@ export default function Page() {
         });
 
         setNewData(true);
-        /*setQueryData((prev) => {
-          !prev
-            ? setQueryDataArr([
-                ...queryDataArr,
-                {
-                  content: data.data,
-                  originalQuery,
-                },
-              ])
-            : setQueryDataArr([
-                ...queryDataArr,
-                {
-                  content: prev + data.data,
-                  originalQuery,
-                },
-              ]);
-          return prev + data.data;
-        });*/
       }
     });
 
