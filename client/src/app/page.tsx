@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useRef, useState, useEffect } from "react";
 import { io } from "socket.io-client";
-import { useUiStore } from "../../lib/store";
+import { useSettingsStore, useUiStore } from "../../lib/store";
 import { CustomInput } from "@/components/CustomInput";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { PrettifiedData } from "@/components/PrettifiedData";
@@ -35,6 +35,7 @@ export default function Page() {
     setAreDataCopied,
     setIsLoading,
   } = useUiStore();
+  const { model, temperature } = useSettingsStore();
 
   const onBtnEvent = async (variant: "submit" | "regenerate" = "submit") => {
     setAreDataCopied(false);
@@ -47,7 +48,7 @@ export default function Page() {
         setIsLoading(false);
         throw new Error("Search query should be at lest 3 char long");
       }
-      socket.emit("askChatGPT", { query: searchQuery });
+      socket.emit("askChatGPT", { query: searchQuery, model, temperature });
       if (variant === "submit") setSearchQuery("");
     } catch (err) {
       const typedErr = err as CustomError;
@@ -108,7 +109,7 @@ export default function Page() {
           width={{ sm: 200, lg: 300 }}
           style={{
             backgroundColor: "#868E96",
-            border: "#868E96",
+            borderRight: "2px solid black",
           }}
         >
           <Sidebar />
@@ -133,7 +134,8 @@ export default function Page() {
           p="md"
           style={{
             backgroundColor: "#868E96",
-            border: "#868E96",
+            //border: "#868E96",
+            borderBottom: "2px solid black",
           }}
         >
           <div

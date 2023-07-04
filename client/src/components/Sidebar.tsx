@@ -13,7 +13,6 @@ export const Sidebar = () => {
     changeTemperature,
     changeIndex,
   } = useSettingsStore();
-  const theme = useMantineTheme();
 
   return (
     <div
@@ -60,7 +59,7 @@ export const Sidebar = () => {
           { value: 100, label: "100%" },
         ]}
         defaultValue={temperature}
-        onChange={(e) => changeTemperature(e)}
+        onChange={(e) => changeTemperature(e / 100)}
         styles={{
           markLabel: {
             color: "black",

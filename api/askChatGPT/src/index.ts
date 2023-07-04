@@ -20,7 +20,9 @@ const openai = new OpenAIApi(config);
 
 io.on("connection", (socket) => {
   socket.on("askChatGPT", async (data) => {
-    const { query } = data;
+    const { query, temperature, model } = data;
+    console.log("temp: ", temperature);
+    console.log("model: ", model);
     try {
       if (typeof query !== "string" || query === "") {
         socket.emit("err", { msg: "Not valid query" });
@@ -40,9 +42,9 @@ io.on("connection", (socket) => {
 
         const { data } = await openai.createChatCompletion(
           {
-            model: "gpt-3.5-turbo-16k",
+            model: model ? model : "gpt-3.5-turbo-16k",
             messages: [{ role: "user", content: newQuery }],
-            temperature: 0.1,
+            temperature: temperature ? temperature : 0.1,
             stream: true,
           },
           {
