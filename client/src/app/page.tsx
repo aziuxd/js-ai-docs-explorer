@@ -109,7 +109,7 @@ export default function Page() {
           width={{ sm: 200, lg: 300 }}
           style={{
             backgroundColor: "#868E96",
-            borderRight: "2px solid black",
+            borderRight: "1px solid black",
           }}
         >
           <Sidebar />
@@ -135,7 +135,7 @@ export default function Page() {
           style={{
             backgroundColor: "#868E96",
             //border: "#868E96",
-            borderBottom: "2px solid black",
+            borderBottom: "1px solid black",
           }}
         >
           <div
@@ -154,8 +154,6 @@ export default function Page() {
                 mr="xl"
               />
             </MediaQuery>
-
-            <Text>Application header</Text>
           </div>
         </Header>
       }
@@ -166,7 +164,7 @@ export default function Page() {
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          maxHeight: "100%",
+          maxHeight: "92%",
           overflowY: "auto",
           gap: "1rem",
           padding: "20px",

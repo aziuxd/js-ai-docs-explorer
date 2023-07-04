@@ -100,7 +100,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
         style={{
           display: "flex",
           gap: "10px",
-          maxHeight: "80%",
+          //maxHeight: "80%",
           overflowY: "auto",
         }}
       >
