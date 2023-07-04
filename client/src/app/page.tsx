@@ -8,7 +8,7 @@ import {
   IconClipboard,
   IconClipboardCheck,
 } from "@tabler/icons-react";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 import Highlighter from "react-highlight-words";
 import Linkify from "linkify-react";
 import { useMediaQuery } from "@mantine/hooks";
@@ -76,11 +76,13 @@ export default function Home() {
   const inputRef = useRef(
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
-  const setNewData = useUiStore((state) => state.setNewData);
-  const setOriginalQuery = useUiStore((state) => state.setOriginalQuery);
-  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
-  const setIsLoading = useUiStore((state) => state.setIsLoading);
-  const isLoading = useUiStore((state) => state.isLoading);
+  const {
+    isLoading,
+    setNewData,
+    setOriginalQuery,
+    setAreDataCopied,
+    setIsLoading,
+  } = useUiStore();
 
   const onSubmit = async () => {
     setAreDataCopied(false);
@@ -190,7 +192,7 @@ const BtnSubmit = ({
   searchQuery: string;
 }) => {
   const match = useMediaQuery("(max-width: 400px)");
-  const newData = useUiStore((state) => state.newData);
+  const { newData } = useUiStore();
   return (
     <Button
       className="btn-submit"
@@ -237,9 +239,7 @@ const PrettifiedData = ({
   data: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const newData = useUiStore((state) => state.newData);
-  const areDataCopied = useUiStore((state) => state.areDataCopied);
-  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
+  const { newData, areDataCopied, setAreDataCopied } = useUiStore();
   if (
     !data?.includes("Secondo la documentazione") &&
     !data?.includes("The documentation says")
@@ -385,9 +385,7 @@ const BtnRegenerateRes = ({
 }: {
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-  const originalQuery = useUiStore((state) => state.originalQuery);
-  const setIsLoading = useUiStore((state) => state.setIsLoading);
-  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
+  const { originalQuery, setIsLoading, setAreDataCopied } = useUiStore();
   return (
     <div
       style={{
