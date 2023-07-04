@@ -13,6 +13,7 @@ import Highlighter from "react-highlight-words";
 import Linkify from "linkify-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { io } from "socket.io-client";
+import { useUiStore } from "../../lib/store";
 
 interface CustomError {
   message?: string;
@@ -75,10 +76,11 @@ export default function Home() {
   const inputRef = useRef(
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
-  const [newData, setNewData] = useState<boolean>(true);
-  const [originalQuery, setOriginalQuery] = useState<string>(searchQuery);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [areDataCopied, setAreDataCopied] = useState<boolean>(false);
+  const setNewData = useUiStore((state) => state.setNewData);
+  const setOriginalQuery = useUiStore((state) => state.setOriginalQuery);
+  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
+  const setIsLoading = useUiStore((state) => state.setIsLoading);
+  const isLoading = useUiStore((state) => state.isLoading);
 
   const onSubmit = async () => {
     setAreDataCopied(false);
@@ -164,16 +166,7 @@ export default function Home() {
         {isLoading ? (
           <LoadingScreen />
         ) : queryData ? (
-          <PrettifiedData
-            data={queryData}
-            newData={newData}
-            originalQuery={originalQuery}
-            setQueryData={setQueryData}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            areDataCopied={areDataCopied}
-            setAreDataCopied={setAreDataCopied}
-          />
+          <PrettifiedData data={queryData} setQueryData={setQueryData} />
         ) : (
           ""
         )}
@@ -182,7 +175,6 @@ export default function Home() {
           searchQuery={searchQuery}
           onSubmit={onSubmit}
           setSearchQuery={setSearchQuery}
-          newData={newData}
         />
       </div>
       <div></div>
@@ -193,13 +185,12 @@ export default function Home() {
 const BtnSubmit = ({
   onSubmit,
   searchQuery,
-  newData,
 }: {
   onSubmit: () => any;
   searchQuery: string;
-  newData: boolean;
 }) => {
   const match = useMediaQuery("(max-width: 400px)");
+  const newData = useUiStore((state) => state.newData);
   return (
     <Button
       className="btn-submit"
@@ -241,23 +232,14 @@ const BtnSubmit = ({
 
 const PrettifiedData = ({
   data,
-  newData,
-  originalQuery,
   setQueryData,
-  isLoading,
-  setIsLoading,
-  areDataCopied,
-  setAreDataCopied,
 }: {
   data: string;
-  newData: boolean;
-  originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
-  isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  areDataCopied: boolean;
-  setAreDataCopied: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const newData = useUiStore((state) => state.newData);
+  const areDataCopied = useUiStore((state) => state.areDataCopied);
+  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
   if (
     !data?.includes("Secondo la documentazione") &&
     !data?.includes("The documentation says")
@@ -350,14 +332,7 @@ const PrettifiedData = ({
           {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
         </div>
       </div>
-      {!newData && data && (
-        <BtnRegenerateRes
-          originalQuery={originalQuery}
-          setQueryData={setQueryData}
-          setIsLoading={setIsLoading}
-          setAreDataCopied={setAreDataCopied}
-        />
-      )}
+      {!newData && data && <BtnRegenerateRes setQueryData={setQueryData} />}
     </div>
   );
 };
@@ -366,13 +341,11 @@ const CustomInput = ({
   inputRef,
   onSubmit,
   searchQuery,
-  newData,
   setSearchQuery,
 }: {
   inputRef: React.MutableRefObject<HTMLTextAreaElement | null>;
   onSubmit: () => any;
   searchQuery: string;
-  newData: boolean;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   return (
@@ -402,26 +375,19 @@ const CustomInput = ({
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      <BtnSubmit
-        onSubmit={onSubmit}
-        searchQuery={searchQuery}
-        newData={newData}
-      />
+      <BtnSubmit onSubmit={onSubmit} searchQuery={searchQuery} />
     </div>
   );
 };
 
 const BtnRegenerateRes = ({
-  originalQuery,
   setQueryData,
-  setIsLoading,
-  setAreDataCopied,
 }: {
-  originalQuery: string;
   setQueryData: React.Dispatch<React.SetStateAction<string>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setAreDataCopied: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const originalQuery = useUiStore((state) => state.originalQuery);
+  const setIsLoading = useUiStore((state) => state.setIsLoading);
+  const setAreDataCopied = useUiStore((state) => state.setAreDataCopied);
   return (
     <div
       style={{
