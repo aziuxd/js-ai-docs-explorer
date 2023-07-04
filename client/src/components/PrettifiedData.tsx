@@ -11,6 +11,7 @@ import Highlighter from "react-highlight-words";
 import { useUiStore } from "../../lib/store";
 import { BtnRegenerateRes } from "./BtnRegenerateRes";
 import { useState } from "react";
+import silwaLogo from "../../public/silwa.jpg";
 
 interface PrettifiedDataProps {
   data: Data;
@@ -121,7 +122,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({
           overflowY: "auto",
         }}
       >
-        <Avatar />
+        <Avatar color="blue" />
         <div
           className="prettified-data"
           style={{
