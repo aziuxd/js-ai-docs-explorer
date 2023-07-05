@@ -6,7 +6,7 @@ import {
   IconClipboardCheck,
   IconClipboard,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface PrettifiedDataProps {
   data: Data;

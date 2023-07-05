@@ -40,6 +40,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
           : `${(width as number) - 200}px`,
         //backgroundColor: "#71717a !important",
         backgroundColor: "#4dabf7",
+        zIndex: 101,
         //borderRadius: "2rem !important",
         //border: "2px solid red",
       }}

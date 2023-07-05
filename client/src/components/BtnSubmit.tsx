@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconSend } from "@tabler/icons-react";
 import { useUiStore } from "../../lib/store";
+import { useEffect } from "react";
 
 interface BtnSubmitProps {
   onSubmit: () => any;
@@ -15,10 +16,21 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
 }) => {
   const match = useMediaQuery("(max-width: 400px)");
   const { newData } = useUiStore();
+  useEffect(() => {
+    console.log(
+      newData
+        ? searchQuery === ""
+          ? true
+          : false
+        : searchQuery === ""
+        ? true
+        : false
+    );
+  });
   return (
     <Button
       className="btn-submit"
-      color="#71717a "
+      color="#4dabf7 "
       style={{
         display: "flex",
         width: "10%",
@@ -34,7 +46,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
         paddingRight: match ? "10px !important" : "auto",
         cursor: "auto",
       }}
-      disabled={searchQuery === "" && newData}
+      disabled={searchQuery === "" ? true : newData ? true : false}
     >
       <IconSend
         onClick={() => onSubmit()}

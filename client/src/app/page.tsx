@@ -27,10 +27,15 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [queryData, setQueryData] = useState<string>("");
   const [queryDataArr, updateQueryDataArr] = useImmer<QueryData[]>([]);
+  const [currScrollHeight, setCurrScrollHeight] = useState<number | null>(null);
 
   const inputRef = useRef(
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
+  const containerRef = useRef(
+    null
+  ) as React.MutableRefObject<HTMLDivElement | null>;
+
   const {
     isLoading,
     setNewData,
@@ -42,7 +47,7 @@ export default function Page() {
   const { model, temperature } = useSettingsStore();
 
   const onBtnEvent = async (variant: "submit" | "regenerate" = "submit") => {
-    if (variant === "submit") setNewData(true);
+    setNewData(true);
     setQueryData("");
     if (variant === "regenerate")
       updateQueryDataArr((draft) => {
@@ -62,7 +67,7 @@ export default function Page() {
         variant,
       });
 
-      if (variant === "submit") setSearchQuery("");
+      setSearchQuery("");
     } catch (err) {
       const typedErr = err as CustomError;
       setQueryData(typedErr?.message as string);
@@ -84,6 +89,11 @@ export default function Page() {
     });
 
     socket.on("askChatGPTResponse", (data: any) => {
+      setSearchQuery("");
+      if (containerRef?.current) {
+        setCurrScrollHeight(containerRef.current.scrollHeight);
+        containerRef.current.scrollTo(0, currScrollHeight as number);
+      }
       setIsLoading(false);
       if (data.data === "DONE" && data.variant !== "regenerate") {
         setNewData(false);
@@ -122,6 +132,8 @@ export default function Page() {
     });
 
     socket.on("err", (err: any) => {
+      if (containerRef?.current)
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
       setIsLoading(false);
       updateQueryDataArr((draft) => {
         if (draft.length === 0) {
@@ -227,13 +239,15 @@ export default function Page() {
       }
     >
       <div
+        ref={containerRef}
         className="container"
         style={{
           display: "flex",
           flexDirection: "column",
           height: "100%",
           maxHeight: "92%",
-          overflowY: "auto",
+          overflowY: "scroll",
+          bottom: 0,
           gap: "1rem",
           padding: "20px",
           paddingTop: "40px",

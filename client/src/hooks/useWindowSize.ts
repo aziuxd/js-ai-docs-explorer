@@ -24,14 +24,25 @@ export const useWindowSize = () => {
       });
     };
 
+    const onLoad = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
     // Add event listener
     window.addEventListener("resize", onResize);
+    window.addEventListener("load", onLoad);
 
     // Call handler right away so state gets updated with initial window size
-    onResize();
+    onLoad();
 
     // Remove event listener on cleanup
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("load", onLoad);
+    };
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
 };
