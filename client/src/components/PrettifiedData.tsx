@@ -6,10 +6,7 @@ import {
   IconClipboardCheck,
   IconClipboard,
 } from "@tabler/icons-react";
-import Linkify from "linkify-react";
-import Highlighter from "react-highlight-words";
-import { useUiStore } from "../../lib/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PrettifiedDataProps {
   data: Data;
@@ -20,62 +17,11 @@ interface Data {
   originalQuery: string;
 }
 
-const findChunks = ({
-  // @ts-ignore
-  autoEscape,
-  // @ts-ignore
-  caseSensitive,
-  // @ts-ignore
-  sanitize,
-  // @ts-ignore
-  searchWords,
-  // @ts-ignore
-  textToHighlight,
-}) => {
-  // @ts-ignore
-  const chunks = [];
-  const textLow = textToHighlight.toLowerCase();
-  const sep = /[\s]+/;
-
-  const singleTextWords = textLow.split(sep);
-
-  let fromIndex = 0;
-  const singleTextWordsWithPos = singleTextWords.map((s: any) => {
-    const indexInWord = textLow.indexOf(s, fromIndex);
-    fromIndex = indexInWord;
-    return {
-      word: s,
-      index: indexInWord,
-    };
-  });
-
-  // @ts-ignore
-  searchWords.forEach((sw) => {
-    const swLow = sw.toLowerCase();
-    // @ts-ignore
-    singleTextWordsWithPos.forEach((s) => {
-      if (s.word.includes(swLow)) {
-        const start = s.index;
-        const end = s.index + s.word.length;
-        chunks.push({
-          start,
-          end,
-        });
-      }
-    });
-  });
-
-  // @ts-ignore
-  return chunks;
-};
-
 export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
-  const { newData } = useUiStore();
   const [areDataCopied, setAreDataCopied] = useState<boolean>(false);
   try {
     const { content, originalQuery } = data;
-    console.log(originalQuery);
-    if (!content || content === "" || Object.is({}, data)) {
+    if (!content || content === "" || Object.keys(data).length === 0) {
       return "";
     }
     if (
@@ -115,17 +61,10 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
         </>
       );
     let parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
-    console.log(JSON.stringify(parsedData));
     parsedData = parsedData.replaceAll("\n", "<br />");
-    /*.replace(content[content.indexOf("1") - 1], "\n")
-    .replace(content[content.indexOf("2") - 1], "\n")
-    .replace(content[content.indexOf("3") - 1], "\n")
-    .replace(content[content.indexOf("4") - 1], "\n")
-    .replace(content[content.indexOf("5") - 1], "\n")
-    .replace(content[content.indexOf("6") - 1], "\n")
-    .replace(content[content.indexOf("7") - 1], "\n")
-    .replace(content[content.indexOf("8") - 1], "\n")
-    .replace(content[content.indexOf("9") - 1], "\n");*/
+    if (!parsedData.slice(parsedData.indexOf(":") + 1)) {
+      return "";
+    }
 
     return (
       <>
@@ -157,59 +96,36 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
                 }}
               >
                 <h2>{content?.slice(0, content?.indexOf(":"))}</h2>
-                {!newData && data ? (
-                  areDataCopied ? (
-                    <IconClipboardCheck
-                      style={{
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        navigator.clipboard.writeText(content);
-                        setAreDataCopied(true);
-                      }}
-                    />
-                  ) : (
-                    <IconClipboard
-                      style={{
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        navigator.clipboard.writeText(content);
-                        setAreDataCopied(true);
-                      }}
-                    />
-                  )
+                {areDataCopied ? (
+                  <IconClipboardCheck
+                    style={{
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(content);
+                      setAreDataCopied(true);
+                    }}
+                  />
                 ) : (
-                  ""
+                  <IconClipboard
+                    style={{
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(content);
+                      setAreDataCopied(true);
+                    }}
+                  />
                 )}
               </div>
-              <Highlighter
-                highlightClassName="YourHighlightClass"
-                textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
-                searchWords={["http", "@", "www"]}
-                autoEscape={true}
-                //@ts-ignore
-                findChunks={findChunks}
-                highlightTag={({ children, highlightIndex }) => (
-                  <Linkify as="p">
-                    <p
-                      style={{
-                        color: "#67e8f9",
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: parsedData.slice(parsedData.indexOf(":") + 1),
-                      }}
-                    />
-                  </Linkify>
-                )}
-              />
-              {/*<p
+              <p
                 dangerouslySetInnerHTML={{
                   __html: parsedData.slice(parsedData.indexOf(":") + 1),
                 }}
-              />*/}
-
-              {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
+                style={{
+                  width: "100% !important",
+                }}
+              />
             </div>
           </div>
         </div>

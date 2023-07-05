@@ -15,7 +15,7 @@ interface CustomError {
   message?: string;
 }
 
-interface QueryDataArr {
+interface QueryData {
   originalQuery: string;
   content: string;
 }
@@ -26,7 +26,7 @@ export default function Page() {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [queryData, setQueryData] = useState<string>("");
-  const [queryDataArr, updateQueryDataArr] = useImmer<QueryDataArr[]>([]);
+  const [queryDataArr, updateQueryDataArr] = useImmer<QueryData[]>([]);
 
   const inputRef = useRef(
     null
@@ -46,7 +46,7 @@ export default function Page() {
     setQueryData("");
     if (variant === "regenerate")
       updateQueryDataArr((draft) => {
-        const i = draft.length - 2 >= 0 ? draft.length - 2 : 0;
+        const i = draft.length - 1 >= 0 ? draft.length - 1 : 0;
         draft[i].content = "";
       });
 
@@ -83,22 +83,14 @@ export default function Page() {
       reconnection: true,
     });
 
-    socket.on("connect", () => {
-      console.log("connected!");
-    });
-
     socket.on("askChatGPTResponse", (data: any) => {
       setIsLoading(false);
       if (data.data === "DONE" && data.variant !== "regenerate") {
         setNewData(false);
-        updateQueryDataArr((draft) => {
-          draft.push({} as QueryDataArr);
-        });
       }
       if (data.data && data.data !== "DONE") {
         if (data.variant === "regenerate") {
           setQueryData((prev) => {
-            updateQueryDataArr((draft) => {});
             return prev + data.data;
           });
         } else
@@ -106,22 +98,20 @@ export default function Page() {
             updateQueryDataArr((draft) => {
               const i = draft.length - 1 >= 0 ? draft.length - 1 : 0;
               if (!prev) {
-                if (!draft[i]?.content && !draft[i]?.originalQuery) {
+                if (draft.length !== 0 && Object.keys(draft[i]).length === 0)
                   draft[i] = {
                     originalQuery: data.originalQuery,
-                    content: prev + data.data,
+                    content: data.data,
                   };
-                } else
+                else
                   draft.push({
                     originalQuery: data.originalQuery,
                     content: data.data,
                   });
               } else {
                 //this if statement gets hit also when btn regenerate is clicked
-                draft[data.variant === "regenerate" ? i - 1 : i].content =
-                  prev + data.data;
-                draft[data.variant === "regenerate" ? i - 1 : i].originalQuery =
-                  data.originalQuery;
+                draft[i].content = prev + data.data;
+                draft[i].originalQuery = data.originalQuery;
               }
             });
             return prev + data.data;
@@ -151,8 +141,6 @@ export default function Page() {
                 : err.msg,
           };
         }
-
-        draft.push({} as QueryDataArr);
       });
       if (err.msg === "No data") {
         setQueryData("No matches found for your query");
@@ -273,7 +261,7 @@ export default function Page() {
               }}
             >
               {queryDataArr.map((currData, idx) => {
-                return Object.is(currData, {}) ? (
+                return Object.keys(currData).length === 0 ? (
                   ""
                 ) : (
                   <PrettifiedData data={currData} key={idx} />

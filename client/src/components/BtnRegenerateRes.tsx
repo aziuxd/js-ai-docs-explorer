@@ -1,4 +1,5 @@
 "use client";
+import { useWindowSize } from "@/hooks/useWindowSize";
 import { Button } from "@mantine/core";
 
 interface BtnRegenerateResProps {
@@ -8,6 +9,7 @@ interface BtnRegenerateResProps {
 export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
   onBtnEvent,
 }) => {
+  const { width } = useWindowSize();
   return (
     <div
       style={{
@@ -20,6 +22,7 @@ export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
       <Button
         onClick={() => {
           onBtnEvent("regenerate");
+          console.log(width);
         }}
       >
         Regenerate response
