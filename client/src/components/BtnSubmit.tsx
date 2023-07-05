@@ -17,15 +17,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
   const match = useMediaQuery("(max-width: 400px)");
   const { newData } = useUiStore();
   useEffect(() => {
-    console.log(
-      newData
-        ? searchQuery === ""
-          ? true
-          : false
-        : searchQuery === ""
-        ? true
-        : false
-    );
+    console.log(searchQuery === "");
   });
   return (
     <Button
@@ -56,7 +48,7 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
           //border: "2px solid yellow",
           cursor: "pointer",
           backgroundColor: `${
-            searchQuery === "" && newData ? "#4dabf7" : "black"
+            searchQuery === "" ? "#4dabf7" : newData ? "#4dabf7" : "black"
           }`,
           opacity: "1",
           padding: "0",

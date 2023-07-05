@@ -95,8 +95,9 @@ export default function Page() {
         containerRef.current.scrollTo(0, currScrollHeight as number);
       }
       setIsLoading(false);
-      if (data.data === "DONE" && data.variant !== "regenerate") {
+      if (data.data === "DONE") {
         setNewData(false);
+        setSearchQuery("");
       }
       if (data.data && data.data !== "DONE") {
         if (data.variant === "regenerate") {
