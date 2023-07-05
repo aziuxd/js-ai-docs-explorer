@@ -93,6 +93,7 @@ export default function Page() {
     if (inputRef.current) {
       inputRef?.current?.focus();
     }
+    //eslint-disable-next-line
   }, []);
 
   const SocketHandler = async () => {
@@ -104,20 +105,8 @@ export default function Page() {
     socket.on("askChatGPTResponse", (data: any) => {
       console.log(data.data);
       setSearchQuery("");
-      if (containerRef?.current) {
+      if (containerRef?.current)
         containerRef.current.scrollTop = containerRef.current.scrollHeight;
-        /*const scrollHeight = containerRef?.current.scrollHeight;
-        const height = containerRef?.current.clientHeight;
-        const maxScrollTop = scrollHeight - height;
-        containerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;*/
-        //setCurrScrollHeight(containerRef.current.offsetHeight);
-        //containerRef.current.scrollTo(0, currScrollHeight as number);
-        /*containerRef.current.scrollTo(
-          containerRef.current.offsetWidth,
-          containerRef.current.offsetHeight
-        );*/
-        //containerRef?.current.scrollIntoView();
-      }
       setIsLoading(false);
       if (data.data === "DONE") {
         setNewData(false);
