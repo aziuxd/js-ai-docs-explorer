@@ -26,6 +26,7 @@ async function start() {
       const api_key = process.env.API_KEY as string;
 
       const optimizedQuery = optimizeQuery(query);
+      console.log("GUARDA QUI PROGRAMMATORE: ", optimizedQuery);
       const credentials = new AzureKeyCredential(api_key);
       const client = new SearchClient(endpoint, index, credentials);
 
@@ -59,7 +60,22 @@ async function start() {
           }
         }
 
-        if (!res.length) reply.status(404).send({ ok: false });
+        if (!res.length) {
+          results = await client.search(query, {
+            highlightFields: "content",
+          });
+
+          for await (const result of results.results) {
+            //@ts-ignore
+            for (const curr_highlight of result.highlights?.content) {
+              res.push(curr_highlight);
+            }
+          }
+
+          if (!res.length) reply.status(404).send({ ok: false });
+
+          return JSON.stringify({ data: res });
+        }
 
         console.log(res);
 

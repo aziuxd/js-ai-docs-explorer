@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
 
       msgs.push({ role: "user", content: newQuery });
 
-      console.log(msgs.filter(({ role }) => role === "system"));
+      //console.log(msgs.filter(({ role }) => role === "system"));
       const { data } = await openai.createChatCompletion(
         {
           model: model ? model : "gpt-3.5-turbo-16k",
@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
           }
           try {
             const { choices } = JSON.parse(message);
-            console.log(choices);
+            //console.log(choices);
             const progressiveData = choices[0]?.delta?.content;
             gptRes += progressiveData;
             socket.emit("askChatGPTResponse", {
