@@ -10,6 +10,8 @@ import { PrettifiedData } from "@/components/PrettifiedData";
 import { Sidebar } from "@/components/Sidebar";
 import { useImmer } from "use-immer";
 import { BtnRegenerateRes } from "@/components/BtnRegenerateRes";
+import { useWindowSize } from "@/hooks/useWindowSize";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface CustomError {
   message?: string;
@@ -36,6 +38,10 @@ export default function Page() {
     null
   ) as React.MutableRefObject<HTMLDivElement | null>;
 
+  const match = useMediaQuery("(max-width: 768px)");
+  const matchLg = useMediaQuery("(min-width: 75em)");
+  const { width } = useWindowSize();
+
   const {
     isLoading,
     setNewData,
@@ -45,6 +51,11 @@ export default function Page() {
     newData,
   } = useUiStore();
   const { model, temperature } = useSettingsStore();
+
+  const onComponentDidMount = () => {
+    if (containerRef?.current)
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+  };
 
   const onBtnEvent = async (variant: "submit" | "regenerate" = "submit") => {
     setNewData(true);
@@ -65,6 +76,7 @@ export default function Page() {
         model,
         temperature,
         variant,
+        ms: queryDataArr,
       });
 
       setSearchQuery("");
@@ -75,6 +87,7 @@ export default function Page() {
   };
 
   useEffect(() => {
+    queryDataArr;
     SocketHandler();
 
     if (inputRef.current) {
@@ -89,10 +102,21 @@ export default function Page() {
     });
 
     socket.on("askChatGPTResponse", (data: any) => {
+      console.log(data.data);
       setSearchQuery("");
       if (containerRef?.current) {
-        setCurrScrollHeight(containerRef.current.scrollHeight);
-        containerRef.current.scrollTo(0, currScrollHeight as number);
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        /*const scrollHeight = containerRef?.current.scrollHeight;
+        const height = containerRef?.current.clientHeight;
+        const maxScrollTop = scrollHeight - height;
+        containerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;*/
+        //setCurrScrollHeight(containerRef.current.offsetHeight);
+        //containerRef.current.scrollTo(0, currScrollHeight as number);
+        /*containerRef.current.scrollTo(
+          containerRef.current.offsetWidth,
+          containerRef.current.offsetHeight
+        );*/
+        //containerRef?.current.scrollIntoView();
       }
       setIsLoading(false);
       if (data.data === "DONE") {
@@ -135,6 +159,7 @@ export default function Page() {
     socket.on("err", (err: any) => {
       if (containerRef?.current)
         containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      //containerRef.current.scrollTop = containerRef.current.offsetHeight;
       setIsLoading(false);
       updateQueryDataArr((draft) => {
         if (draft.length === 0) {
@@ -167,7 +192,7 @@ export default function Page() {
       styles={{
         main: {
           background: "white",
-          overflowY: "auto",
+          overflowY: "hidden",
         },
       }}
       navbarOffsetBreakpoint="sm"
@@ -245,16 +270,21 @@ export default function Page() {
         style={{
           display: "flex",
           flexDirection: "column",
-          height: "100%",
-          maxHeight: "92%",
+          height: "80% !important",
+          maxHeight: "80% !important",
+          width: match
+            ? "100%"
+            : matchLg
+            ? `${(width as number) - 335}px`
+            : `${(width as number) - 235}px`,
           overflowY: "scroll",
-          bottom: 0,
           gap: "1rem",
           padding: "20px",
           paddingTop: "40px",
           //backgroundColor: "#9ca3af",
           backgroundColor: "white",
-          position: "relative",
+          position: "fixed",
+          border: "2px solid red",
         }}
       >
         {isLoading ? (
@@ -284,7 +314,11 @@ export default function Page() {
               })}
             </ul>
             {!newData && queryData && (
-              <BtnRegenerateRes onBtnEvent={onBtnEvent} />
+              <BtnRegenerateRes
+                onBtnEvent={onBtnEvent}
+                onComponentDidMount={onComponentDidMount}
+                ref={containerRef}
+              />
             )}
           </div>
         ) : (

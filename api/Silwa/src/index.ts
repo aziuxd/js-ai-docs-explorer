@@ -46,6 +46,8 @@ async function start() {
       if (res.length) return JSON.stringify({ data: res });
       //if not redo the process without stemming (sometimes this can be the issue)
       else {
+        const r = optimizeQuery(query, false);
+        console.log(r);
         results = await client.search(optimizeQuery(query, false), {
           highlightFields: "content",
         });
@@ -58,6 +60,8 @@ async function start() {
         }
 
         if (!res.length) reply.status(404).send({ ok: false });
+
+        console.log(res);
 
         return JSON.stringify({ data: res });
       }

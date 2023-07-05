@@ -23,7 +23,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   const { width } = useWindowSize();
   const ref = useRef(null);
 
-  useEffect(() => {}, [width]);
+  //useEffect(() => {}, [width]);
 
   return (
     <div

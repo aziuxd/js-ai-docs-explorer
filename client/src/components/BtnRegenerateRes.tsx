@@ -1,15 +1,20 @@
 "use client";
-import { useWindowSize } from "@/hooks/useWindowSize";
 import { Button } from "@mantine/core";
+import { useEffect, forwardRef } from "react";
 
-interface BtnRegenerateResProps {
-  onBtnEvent: (variant: "submit" | "regenerate") => any;
-}
-
-export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
-  onBtnEvent,
-}) => {
-  const { width } = useWindowSize();
+export const BtnRegenerateRes = forwardRef(function BtnRegenerateRes(
+  {
+    onBtnEvent,
+    onComponentDidMount,
+  }: {
+    onBtnEvent: (variant: "submit" | "regenerate") => any;
+    onComponentDidMount: () => void;
+  },
+  ref: React.ForwardedRef<HTMLDivElement | null>
+) {
+  useEffect(() => {
+    onComponentDidMount();
+  });
   return (
     <div
       style={{
@@ -22,11 +27,10 @@ export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
       <Button
         onClick={() => {
           onBtnEvent("regenerate");
-          console.log(width);
         }}
       >
         Regenerate response
       </Button>
     </div>
   );
-};
+});

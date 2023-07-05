@@ -60,8 +60,11 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
           </div>
         </>
       );
-    let parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
-    parsedData = parsedData.replaceAll("\n", "<br />");
+    const parsedData = content
+      ?.replaceAll("<em>", "")
+      .replaceAll("</em>", "")
+      .replaceAll("\n", "<br />");
+
     if (!parsedData.slice(parsedData.indexOf(":") + 1)) {
       return "";
     }
