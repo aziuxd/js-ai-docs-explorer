@@ -118,8 +118,10 @@ export default function Page() {
                   });
               } else {
                 //this if statement gets hit also when btn regenerate is clicked
-                draft[i].content = prev + data.data;
-                draft[i].originalQuery = data.originalQuery;
+                draft[data.variant === "regenerate" ? i - 1 : i].content =
+                  prev + data.data;
+                draft[data.variant === "regenerate" ? i - 1 : i].originalQuery =
+                  data.originalQuery;
               }
             });
             return prev + data.data;

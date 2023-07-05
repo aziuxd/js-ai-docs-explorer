@@ -116,7 +116,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
       );
     let parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
     console.log(JSON.stringify(parsedData));
-    parsedData = parsedData.replaceAll("\n", "\\n");
+    parsedData = parsedData.replaceAll("\n", "<br />");
     /*.replace(content[content.indexOf("1") - 1], "\n")
     .replace(content[content.indexOf("2") - 1], "\n")
     .replace(content[content.indexOf("3") - 1], "\n")
@@ -191,17 +191,24 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
                 //@ts-ignore
                 findChunks={findChunks}
                 highlightTag={({ children, highlightIndex }) => (
-                  <Linkify>
+                  <Linkify as="p">
                     <p
                       style={{
                         color: "#67e8f9",
                       }}
-                    >
-                      {children}
-                    </p>
+                      dangerouslySetInnerHTML={{
+                        __html: parsedData.slice(parsedData.indexOf(":") + 1),
+                      }}
+                    />
                   </Linkify>
                 )}
               />
+              {/*<p
+                dangerouslySetInnerHTML={{
+                  __html: parsedData.slice(parsedData.indexOf(":") + 1),
+                }}
+              />*/}
+
               {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
             </div>
           </div>
