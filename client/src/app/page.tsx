@@ -106,10 +106,7 @@ export default function Page() {
             updateQueryDataArr((draft) => {
               const i = draft.length - 1 >= 0 ? draft.length - 1 : 0;
               if (!prev) {
-                if (
-                  (!draft[i]?.content && !draft[i]?.originalQuery) ||
-                  Object.is({}, draft[i])
-                ) {
+                if (!draft[i]?.content && !draft[i]?.originalQuery) {
                   draft[i] = {
                     originalQuery: data.originalQuery,
                     content: prev + data.data,
@@ -137,7 +134,7 @@ export default function Page() {
       updateQueryDataArr((draft) => {
         if (draft.length === 0) {
           draft.push({
-            originalQuery,
+            originalQuery: err.originalQuery,
             content:
               err.msg === "No data"
                 ? "No matches found for your query"
@@ -145,7 +142,7 @@ export default function Page() {
           });
         } else {
           draft[draft.length - 1] = {
-            originalQuery,
+            originalQuery: err.originalQuery,
             content:
               err.msg === "No data"
                 ? "No matches found for your query"

@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
       const prob = langDetector.detect(query);
       const res = await fetch(`http://localhost:4000/cognitive/${query}`);
       if (!res.ok) {
-        socket.emit("err", { msg: "No data" });
+        socket.emit("err", { msg: "No data", originalQuery: query });
       } else {
         const apiData = await res.json();
         const { data: parsedData }: { data: string[] } = apiData;

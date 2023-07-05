@@ -12,10 +12,11 @@ export const LoadingScreen = () => {
         zIndex: 100,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "white",
         //border: "2px solid red",
       }}
     >
-      <Loader variant="dots" color="white" />
+      <Loader variant="dots" color="blue" />
     </div>
   );
 };

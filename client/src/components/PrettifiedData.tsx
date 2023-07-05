@@ -114,7 +114,9 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
           </div>
         </>
       );
-    const parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
+    let parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
+    console.log(JSON.stringify(parsedData));
+    parsedData = parsedData.replaceAll("\n", "\\n");
     /*.replace(content[content.indexOf("1") - 1], "\n")
     .replace(content[content.indexOf("2") - 1], "\n")
     .replace(content[content.indexOf("3") - 1], "\n")
@@ -207,7 +209,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
       </>
     );
   } catch (err) {
-    return <div>{JSON.stringify(err)}</div>;
+    return "";
   }
 };
 
