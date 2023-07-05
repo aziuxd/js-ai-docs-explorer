@@ -1,14 +1,6 @@
 "use client";
 import "./styles.css";
-import {
-  AppShell,
-  Burger,
-  Header,
-  MediaQuery,
-  Navbar,
-  Text,
-  Title,
-} from "@mantine/core";
+import { AppShell, Burger, Header, MediaQuery, Navbar } from "@mantine/core";
 import { useRef, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useSettingsStore, useUiStore } from "../../lib/store";
@@ -17,6 +9,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { PrettifiedData } from "@/components/PrettifiedData";
 import { Sidebar } from "@/components/Sidebar";
 import { useImmer } from "use-immer";
+import { BtnRegenerateRes } from "@/components/BtnRegenerateRes";
 
 interface CustomError {
   message?: string;
@@ -26,7 +19,7 @@ let socket: any;
 export default function Page() {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [_, setQueryData] = useState<string>("");
+  const [queryData, setQueryData] = useState<string>("");
   const [queryDataArr, updateQueryDataArr] = useImmer<any[]>([]);
 
   const inputRef = useRef(
@@ -38,18 +31,17 @@ export default function Page() {
     setOriginalQuery,
     setIsLoading,
     originalQuery,
+    newData,
   } = useUiStore();
   const { model, temperature } = useSettingsStore();
 
-  const onBtnEvent = async (
-    variant: "submit" | "regenerate" = "submit",
-    idx?: number
-  ) => {
+  const onBtnEvent = async (variant: "submit" | "regenerate" = "submit") => {
     if (variant === "submit") setNewData(true);
     setQueryData("");
-    if (variant === "regenerate" && typeof idx === "number" && idx >= 0)
+    if (variant === "regenerate")
       updateQueryDataArr((draft) => {
-        draft[idx].content = "";
+        const i = draft.length - 2 >= 0 ? draft.length - 2 : 0;
+        draft[i].content = "";
       });
 
     setIsLoading(true);
@@ -57,19 +49,12 @@ export default function Page() {
       setOriginalQuery(searchQuery);
     }
     try {
-      if (variant === "regenerate" && typeof idx === "number" && idx >= 0) {
-        socket.emit("askChatGPT", {
-          query: queryDataArr[idx].originalQuery,
-          model,
-          temperature,
-          idx,
-        });
-      } else
-        socket.emit("askChatGPT", {
-          query: searchQuery,
-          model,
-          temperature,
-        });
+      socket.emit("askChatGPT", {
+        query: variant === "regenerate" ? originalQuery : searchQuery,
+        model,
+        temperature,
+        variant,
+      });
 
       if (variant === "submit") setSearchQuery("");
     } catch (err) {
@@ -98,33 +83,42 @@ export default function Page() {
 
     socket.on("askChatGPTResponse", (data: any) => {
       setIsLoading(false);
-      if (data.data === "DONE") {
+      if (data.data === "DONE" && data.variant !== "regenerate") {
         setNewData(false);
         updateQueryDataArr((draft) => {
           draft.push({});
         });
       }
       if (data.data && data.data !== "DONE") {
-        setQueryData((prev) => {
-          updateQueryDataArr((draft) => {
-            const i = data.idx ? data.idx : draft.length - 1;
-            if (!prev) {
-              if (Object.is(draft[i], {})) {
-                draft[i] = {
-                  originalQuery: data.originalQuery,
-                  content: data.data,
-                };
-              } else
-                draft.push({
-                  originalQuery: data.originalQuery,
-                  content: data.data,
-                });
-            } else {
-              draft[i].content = prev + data.data;
-            }
+        if (data.variant === "regenerate") {
+          setQueryData((prev) => {
+            updateQueryDataArr((draft) => {});
+            return prev + data.data;
           });
-          return prev + data.data;
-        });
+        } else
+          setQueryData((prev) => {
+            updateQueryDataArr((draft) => {
+              const i = draft.length - 1 >= 0 ? draft.length - 1 : 0;
+              if (!prev) {
+                if (
+                  (!draft[i]?.content && !draft[i]?.originalQuery) ||
+                  Object.is({}, draft[i])
+                ) {
+                  draft[i] = {
+                    originalQuery: data.originalQuery,
+                    content: prev + data.data,
+                  };
+                } else
+                  draft.push({
+                    originalQuery: data.originalQuery,
+                    content: data.data,
+                  });
+              } else {
+                draft[i].content = prev + data.data;
+              }
+            });
+            return prev + data.data;
+          });
 
         setNewData(true);
       }
@@ -255,18 +249,32 @@ export default function Page() {
         {isLoading ? (
           <LoadingScreen />
         ) : queryDataArr.length !== 0 ? (
-          queryDataArr.map((currData, idx) => {
-            return Object.is(currData, {}) ? (
-              ""
-            ) : (
-              <PrettifiedData
-                data={currData}
-                onBtnEvent={onBtnEvent}
-                id={idx}
-                key={idx}
-              />
-            );
-          })
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
+            <ul
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              {queryDataArr.map((currData, idx) => {
+                return Object.is(currData, {}) ? (
+                  ""
+                ) : (
+                  <PrettifiedData data={currData} key={idx} />
+                );
+              })}
+            </ul>
+            {!newData && queryData && (
+              <BtnRegenerateRes onBtnEvent={onBtnEvent} />
+            )}
+          </div>
         ) : (
           ""
         )}

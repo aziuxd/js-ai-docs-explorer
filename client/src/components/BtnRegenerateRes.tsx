@@ -2,13 +2,11 @@
 import { Button } from "@mantine/core";
 
 interface BtnRegenerateResProps {
-  onBtnEvent: () => any;
-  id: number;
+  onBtnEvent: (variant: "submit" | "regenerate") => any;
 }
 
 export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
   onBtnEvent,
-  id,
 }) => {
   return (
     <div
@@ -21,7 +19,7 @@ export const BtnRegenerateRes: React.FC<BtnRegenerateResProps> = ({
     >
       <Button
         onClick={() => {
-          onBtnEvent();
+          onBtnEvent("regenerate");
         }}
       >
         Regenerate response
