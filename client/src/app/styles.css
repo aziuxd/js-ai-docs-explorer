@@ -42,6 +42,10 @@
   padding: 2vw;
 }
 
+.container #user-query {
+  background-color: #4dabf7 !important;
+}
+
 @media (max-width: 410px) {
   .btn-submit {
     padding: 0 !important;
@@ -51,4 +55,17 @@
 .model-input:focus-visible,
 .index-input:focus-visible {
   outline: 2px solid black;
+}
+
+.gpt-messages-list::-webkit-scrollbar,
+.container::-webkit-scrollbar,
+.app-shell::-webkit-scrollbar {
+  display: none !important;
+}
+
+.gpt-messages-list,
+.container,
+.app-shell {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

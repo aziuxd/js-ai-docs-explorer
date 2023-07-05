@@ -76,7 +76,10 @@ io.on("connection", (socket) => {
             try {
               const { choices } = JSON.parse(message);
               const progressiveData = choices[0]?.delta?.content;
-              socket.emit("askChatGPTResponse", { data: progressiveData });
+              socket.emit("askChatGPTResponse", {
+                data: progressiveData,
+                originalQuery: query,
+              });
             } catch (err) {
               socket.emit("err", { msg: err });
             }

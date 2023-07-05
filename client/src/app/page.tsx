@@ -15,12 +15,18 @@ interface CustomError {
   message?: string;
 }
 
+interface QueryDataArr {
+  originalQuery: string;
+  content: string;
+}
+
 let socket: any;
+
 export default function Page() {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [queryData, setQueryData] = useState<string>("");
-  const [queryDataArr, updateQueryDataArr] = useImmer<any[]>([]);
+  const [queryDataArr, updateQueryDataArr] = useImmer<QueryDataArr[]>([]);
 
   const inputRef = useRef(
     null
@@ -86,7 +92,7 @@ export default function Page() {
       if (data.data === "DONE" && data.variant !== "regenerate") {
         setNewData(false);
         updateQueryDataArr((draft) => {
-          draft.push({});
+          draft.push({} as QueryDataArr);
         });
       }
       if (data.data && data.data !== "DONE") {
@@ -114,7 +120,9 @@ export default function Page() {
                     content: data.data,
                   });
               } else {
+                //this if statement gets hit also when btn regenerate is clicked
                 draft[i].content = prev + data.data;
+                draft[i].originalQuery = data.originalQuery;
               }
             });
             return prev + data.data;
@@ -145,7 +153,7 @@ export default function Page() {
           };
         }
 
-        draft.push({});
+        draft.push({} as QueryDataArr);
       });
       if (err.msg === "No data") {
         setQueryData("No matches found for your query");
@@ -155,6 +163,7 @@ export default function Page() {
 
   return (
     <AppShell
+      className="app-shell"
       styles={{
         main: {
           background: "white",
@@ -257,6 +266,7 @@ export default function Page() {
             }}
           >
             <ul
+              className="gpt-messages-list"
               style={{
                 display: "flex",
                 flexDirection: "column",

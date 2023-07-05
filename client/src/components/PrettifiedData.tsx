@@ -73,7 +73,8 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
   const { newData } = useUiStore();
   const [areDataCopied, setAreDataCopied] = useState<boolean>(false);
   try {
-    const { content } = data;
+    const { content, originalQuery } = data;
+    console.log(originalQuery);
     if (!content || content === "" || Object.is({}, data)) {
       return "";
     }
@@ -82,33 +83,36 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
       !content?.includes("The documentation says")
     )
       return (
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            //maxHeight: "80%",
-            overflowY: "auto",
-          }}
-        >
-          <Avatar color="blue" />
+        <>
+          <UserQuery query={originalQuery} />
           <div
-            className="prettified-data"
             style={{
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              borderRadius: "5px",
-              width: "100%",
+              gap: "10px",
+              //maxHeight: "80%",
+              overflowY: "auto",
             }}
           >
-            {data?.content?.includes("No matches found for your query") ? (
-              <IconError404 size={60} />
-            ) : (
-              <IconExclamationCircle size={60} />
-            )}
-            <p>{data?.content}</p>
+            <Avatar color="blue" />
+            <div
+              className="prettified-data"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                borderRadius: "5px",
+                width: "100%",
+              }}
+            >
+              {data?.content?.includes("No matches found for your query") ? (
+                <IconError404 size={60} />
+              ) : (
+                <IconExclamationCircle size={60} />
+              )}
+              <p>{data?.content}</p>
+            </div>
           </div>
-        </div>
+        </>
       );
     const parsedData = content?.replaceAll("<em>", "").replaceAll("</em>", "");
     /*.replace(content[content.indexOf("1") - 1], "\n")
@@ -122,84 +126,119 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
     .replace(content[content.indexOf("9") - 1], "\n");*/
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            //maxHeight: "80%",
-            overflowY: "auto",
-          }}
-        >
-          <Avatar color="blue" />
+      <>
+        <UserQuery query={originalQuery} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <div
-            className="prettified-data"
             style={{
               display: "flex",
-              flexDirection: "column",
               gap: "10px",
-              borderRadius: "5px",
+              //maxHeight: "80%",
+              overflowY: "auto",
             }}
           >
+            <Avatar color="blue" />
             <div
-              className="header"
+              className="prettified-data"
               style={{
                 display: "flex",
-                justifyContent: "space-between",
+                flexDirection: "column",
+                gap: "10px",
+                borderRadius: "5px",
               }}
             >
-              <h2>{content?.slice(0, content?.indexOf(":"))}</h2>
-              {!newData && data ? (
-                areDataCopied ? (
-                  <IconClipboardCheck
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      navigator.clipboard.writeText(content);
-                      setAreDataCopied(true);
-                    }}
-                  />
+              <div
+                className="header"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <h2>{content?.slice(0, content?.indexOf(":"))}</h2>
+                {!newData && data ? (
+                  areDataCopied ? (
+                    <IconClipboardCheck
+                      style={{
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(content);
+                        setAreDataCopied(true);
+                      }}
+                    />
+                  ) : (
+                    <IconClipboard
+                      style={{
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(content);
+                        setAreDataCopied(true);
+                      }}
+                    />
+                  )
                 ) : (
-                  <IconClipboard
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      navigator.clipboard.writeText(content);
-                      setAreDataCopied(true);
-                    }}
-                  />
-                )
-              ) : (
-                ""
-              )}
+                  ""
+                )}
+              </div>
+              <Highlighter
+                highlightClassName="YourHighlightClass"
+                textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
+                searchWords={["http", "@", "www"]}
+                autoEscape={true}
+                //@ts-ignore
+                findChunks={findChunks}
+                highlightTag={({ children, highlightIndex }) => (
+                  <Linkify>
+                    <p
+                      style={{
+                        color: "#67e8f9",
+                      }}
+                    >
+                      {children}
+                    </p>
+                  </Linkify>
+                )}
+              />
+              {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
             </div>
-            <Highlighter
-              highlightClassName="YourHighlightClass"
-              textToHighlight={parsedData.slice(parsedData.indexOf(":") + 1)}
-              searchWords={["http", "@", "www"]}
-              autoEscape={true}
-              //@ts-ignore
-              findChunks={findChunks}
-              highlightTag={({ children, highlightIndex }) => (
-                <Linkify>
-                  <p
-                    style={{
-                      color: "#67e8f9",
-                    }}
-                  >
-                    {children}
-                  </p>
-                </Linkify>
-              )}
-            />
-            {/*<p>{data.slice(data.indexOf(":") + 1)}</p>*/}
           </div>
         </div>
-      </div>
+      </>
     );
   } catch (err) {
     return <div>{JSON.stringify(err)}</div>;
   }
+};
+
+const UserQuery = ({ query }: { query: string }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "10px",
+        overflowY: "auto",
+        justifyContent: "flex-end",
+      }}
+    >
+      <div
+        className="prettified-data"
+        id="user-query"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          borderRadius: "5px",
+          backgroundColor: "#4dabf7 !important",
+          width: "fit-content",
+          justifyContent: "flex-end",
+          alignItems: "flex-end",
+        }}
+      >
+        <h2>Your query</h2>
+        <p>{query}</p>
+      </div>
+      <Avatar color="teal" />
+    </div>
+  );
 };
