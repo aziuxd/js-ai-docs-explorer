@@ -70,7 +70,7 @@ export const Sidebar = () => {
             { value: 75, label: "75%" },
             { value: 100, label: "100%" },
           ]}
-          defaultValue={temperature}
+          defaultValue={temperature * 100}
           onChange={(e) => changeTemperature(e / 100)}
           styles={{
             markLabel: {

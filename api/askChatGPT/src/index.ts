@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
       let cont = msgs.map((x) => x.content + x.role).join();
       //msgs.forEach((x) => (cont += x.role + x.content));
       while (cont.length > threshold) {
-        msgs = msgs.slice(1);
+        msgs = msgs.splice(1);
         cont = "";
         cont = msgs.map((x) => x.role + x.content).join();
       }
@@ -62,16 +62,16 @@ io.on("connection", (socket) => {
       //console.log(msgs.filter(({ role }) => role === "system"));
       const { data } = await openai.createChatCompletion(
         {
-          model: model ? model : "gpt-3.5-turbo-16k",
+          model: model || "gpt-3.5-turbo-16k",
           messages: msgs,
-          temperature: temperature ? temperature : 0.1,
+          temperature: temperature || 0.1,
           stream: true,
         },
         {
           responseType: "stream",
         }
       );
-      console.log("made req to chatGPT");
+      console.log(temperature);
 
       socket.emit("askChatGPTResponse", {
         data: `${
