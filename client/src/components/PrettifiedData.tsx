@@ -7,6 +7,7 @@ import {
   IconClipboard,
 } from "@tabler/icons-react";
 import { useState } from "react";
+import { formatDataForUI } from "../../lib/helpers";
 
 interface PrettifiedDataProps {
   data: Data;
@@ -123,7 +124,7 @@ export const PrettifiedData: React.FC<PrettifiedDataProps> = ({ data }) => {
               </div>
               <p
                 dangerouslySetInnerHTML={{
-                  __html: parsedData.slice(parsedData.indexOf(":") + 1),
+                  __html: formatDataForUI(parsedData),
                 }}
                 style={{
                   width: "100% !important",
