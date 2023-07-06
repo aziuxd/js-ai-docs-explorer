@@ -29,7 +29,8 @@ const threshold = 16000;
 io.on("connection", (socket) => {
   socket.on("askChatGPT", async (data) => {
     console.log("enpoint hit");
-    const { query, temperature, model, variant } = data;
+    const { query, temperature, model, variant, index } = data;
+    console.log("index: ", index);
     //console.log("msg: ", ms);
     //const msgs: GptMessage[] = [] as GptMessage[];
     try {
@@ -38,7 +39,10 @@ io.on("connection", (socket) => {
       }
       const langDetector = new LanguageDetect();
       const prob = langDetector.detect(query);
-      const res = await fetch(`http://localhost:4000/cognitive/${query}`);
+      const res = await fetch(
+        `http://localhost:4000/cognitive/${query.replaceAll("/", ",")}/${index}`
+      );
+      if (!res.ok) console.log("no data");
       /*if (!res.ok) {
         //socket.emit("err", { msg: "No data", originalQuery: query });
       } else {*/
@@ -71,7 +75,6 @@ io.on("connection", (socket) => {
           responseType: "stream",
         }
       );
-      console.log(temperature);
 
       socket.emit("askChatGPTResponse", {
         data: `${

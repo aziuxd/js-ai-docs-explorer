@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useIndexes } from "./helpers";
 
 type Models = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5";
 
@@ -32,7 +33,7 @@ export const useUiStore = create<UiState>((set) => ({
 export const useSettingsStore = create<SettingsState>((set) => ({
   model: "gpt-3.5-turbo-16k",
   temperature: 0.1,
-  index: "documentazione",
+  index: "",
   changeModel: (newModel) => set((state) => ({ model: newModel })),
   changeIndex: (newIndex) => set((state) => ({ index: newIndex })),
   changeTemperature: (newTemperature) =>

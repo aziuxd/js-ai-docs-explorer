@@ -2,8 +2,15 @@
 import { Select, Slider } from "@mantine/core";
 import { useSettingsStore } from "../../lib/store";
 import { User } from "./User";
+import { useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import useSWR from "swr";
 
 type Models = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5";
+
+interface Index {
+  IndexId: string;
+}
 
 export const Sidebar = () => {
   const {
@@ -14,6 +21,19 @@ export const Sidebar = () => {
     changeTemperature,
     changeIndex,
   } = useSettingsStore();
+  const { user } = useUser();
+  const ref = useRef(null) as React.MutableRefObject<HTMLInputElement | null>;
+  const { data: possibleIndexes } = useSWR(
+    `http://localhost:4000/sql/${user?.id}`,
+    (...args) => fetch(...args).then((res) => res.json())
+  );
+
+  useEffect(() => {
+    if (Array.isArray(possibleIndexes?.data)) {
+      changeIndex(possibleIndexes?.data[0]?.IndexId);
+    }
+    //eslint-disable-next-line
+  }, [user?.id, possibleIndexes]);
 
   return (
     <div
@@ -93,11 +113,34 @@ export const Sidebar = () => {
           }}
         />
         <Select
+          ref={ref}
           label="Select your index"
-          data={[{ value: "documentazione", label: "documentazione" }]}
+          data={
+            Array.isArray(possibleIndexes?.data)
+              ? possibleIndexes.data.map(
+                  ({ IndexId }: { IndexId: string }) => IndexId
+                )
+              : []
+          }
+          /*data={
+            Array.isArray(possibleIndexes)
+              ? [
+                  ...possibleIndexes?.map(({ IndexId }) => {
+                    return {
+                      value: IndexId,
+                      label: IndexId,
+                    };
+                  }),
+                ]
+              : []
+          }*/
           searchValue={index}
           defaultValue={index}
-          onSearchChange={(e) => changeIndex(e)}
+          onSearchChange={(e) => {
+            console.log(e);
+            if (e) changeIndex(e);
+            else changeIndex(possibleIndexes?.data[0]?.IndexId);
+          }}
           styles={{
             input: {
               backgroundColor: "white",

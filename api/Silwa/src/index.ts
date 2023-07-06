@@ -4,6 +4,7 @@ import fastify, { FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import { AzureKeyCredential, SearchClient } from "@azure/search-documents";
 import { optimizeQuery } from "../../helpers";
+import * as sql from "mssql";
 
 async function start() {
   const app = fastify();
@@ -17,41 +18,28 @@ async function start() {
     allowedHeaders: ["Authorization", "Content-Type"],
   });
 
-  app.get("/cognitive/:query", async function (req: FastifyRequest, reply) {
-    try {
-      //@ts-ignore
-      const { query } = req.params;
-      const index = process.env.INDEX as string;
-      const endpoint = process.env.SEARCH_ENDPOINT as string;
-      const api_key = process.env.API_KEY as string;
-
-      const optimizedQuery = optimizeQuery(query);
-      console.log("GUARDA QUI PROGRAMMATORE: ", optimizedQuery);
-      const credentials = new AzureKeyCredential(api_key);
-      const client = new SearchClient(endpoint, index, credentials);
-
-      let results = await client.search(optimizedQuery, {
-        highlightFields: "content",
-      });
-
-      let res = [];
-
-      for await (const result of results.results) {
+  app.get(
+    "/cognitive/:query/:index",
+    async function (req: FastifyRequest, reply) {
+      console.log("endpoint hit");
+      try {
         //@ts-ignore
-        for (const curr_highlight of result.highlights?.content) {
-          res.push(curr_highlight);
-        }
-      }
+        const { query, index } = req.params;
+        console.log("the index in silwa api is : ", index);
+        const idx = process.env.INDEX as string;
+        const endpoint = process.env.SEARCH_ENDPOINT as string;
+        const api_key = process.env.API_KEY as string;
 
-      //if there some cognitive search data return them
-      if (res.length) return JSON.stringify({ data: res });
-      //if not redo the process without stemming (sometimes this can be the issue)
-      else {
-        const r = optimizeQuery(query, false);
-        console.log(r);
-        results = await client.search(optimizeQuery(query, false), {
+        const optimizedQuery = optimizeQuery(query);
+        console.log("GUARDA QUI PROGRAMMATORE: ", optimizedQuery);
+        const credentials = new AzureKeyCredential(api_key);
+        const client = new SearchClient(endpoint, index || idx, credentials);
+
+        let results = await client.search(optimizedQuery, {
           highlightFields: "content",
         });
+
+        let res = [];
 
         for await (const result of results.results) {
           //@ts-ignore
@@ -60,8 +48,13 @@ async function start() {
           }
         }
 
-        if (!res.length) {
-          results = await client.search(query, {
+        //if there some cognitive search data return them
+        if (res.length) return JSON.stringify({ data: res });
+        //if not redo the process without stemming (sometimes this can be the issue)
+        else {
+          const r = optimizeQuery(query, false);
+          console.log(r);
+          results = await client.search(optimizeQuery(query, false), {
             highlightFields: "content",
           });
 
@@ -72,17 +65,57 @@ async function start() {
             }
           }
 
-          if (!res.length) reply.status(404).send({ ok: false });
+          if (!res.length) {
+            results = await client.search(query, {
+              highlightFields: "content",
+            });
+
+            for await (const result of results.results) {
+              //@ts-ignore
+              for (const curr_highlight of result.highlights?.content) {
+                res.push(curr_highlight);
+              }
+            }
+
+            if (!res.length) reply.status(404).send({ ok: false });
+
+            return JSON.stringify({ data: res });
+          }
+
+          console.log(res);
 
           return JSON.stringify({ data: res });
         }
-
-        console.log(res);
-
-        return JSON.stringify({ data: res });
+      } catch (err) {
+        return new Error(`Err: ${err}`);
       }
+    }
+  );
+
+  app.get("/sql/:id", async (req, reply) => {
+    try {
+      //@ts-ignore
+      const { id } = req.params;
+      const config: sql.config = {
+        user: "Nicola",
+        password: process.env.PASS,
+        //prettier-ignore
+        server: "stesi-sql-server.database.windows.net",
+        database: "SilwaAiDocsExplorer",
+        options: {
+          encrypt: true,
+        },
+      };
+
+      await sql.connect(config);
+
+      const result = await sql.query(
+        `SELECT IndexId FROM CognitiveIndexConfiguration WHERE UserId=\'${id}\'`
+      );
+
+      return JSON.stringify({ data: result.recordset });
     } catch (err) {
-      return new Error(`Err: ${err}`);
+      reply.status(404).send({ ok: false });
     }
   });
 

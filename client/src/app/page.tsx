@@ -1,7 +1,7 @@
 "use client";
 import "./styles.css";
 import { AppShell, Burger, Header, MediaQuery, Navbar } from "@mantine/core";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 import { io } from "socket.io-client";
 import { useSettingsStore, useUiStore } from "../../lib/store";
 import { CustomInput } from "@/components/CustomInput";
@@ -50,7 +50,7 @@ export default function Page() {
     originalQuery,
     newData,
   } = useUiStore();
-  const { model, temperature } = useSettingsStore();
+  const { model, temperature, index } = useSettingsStore();
 
   const onComponentDidMount = () => {
     if (containerRef?.current)
@@ -77,6 +77,7 @@ export default function Page() {
         temperature,
         variant,
         ms: queryDataArr,
+        index,
       });
 
       setSearchQuery("");

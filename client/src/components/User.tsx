@@ -48,13 +48,14 @@ export const User = () => {
             </p>
           </>
         ) : (
-          <h3
+          <p
             style={{
-              fontSize: "20px",
+              fontSize: "14px",
+              //opacity: ".75",
             }}
           >
             {user?.emailAddresses[0].emailAddress}
-          </h3>
+          </p>
         )}
       </div>
     </div>
