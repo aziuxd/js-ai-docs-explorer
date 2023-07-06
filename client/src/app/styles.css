@@ -69,3 +69,12 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.user-div {
+  transition: all 0.2s;
+}
+
+.user-div:hover {
+  transition: all 0.2s;
+  background-color: #4dabf7 !important;
+}
