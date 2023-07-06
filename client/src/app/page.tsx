@@ -132,7 +132,7 @@ export default function Page() {
                     content: data.data,
                   });
               } else {
-                //this if statement gets hit also when btn regenerate is clicked
+                //this else statement gets hit also when btn regenerate is clicked
                 draft[i].content = prev + data.data;
                 draft[i].originalQuery = data.originalQuery;
               }
