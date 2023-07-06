@@ -20,17 +20,6 @@ interface SettingsState {
   changeTemperature: (newTemperature: number) => void;
 }
 
-interface QueryData {
-  content: string;
-  originalQuery: string;
-}
-
-interface QueryDataArrState {
-  queryDataArr: QueryData[];
-  insertQueryData: (newData: QueryData) => void;
-  updateQueryData: (newData: QueryData | string, idx: number) => void;
-}
-
 export const useUiStore = create<UiState>((set) => ({
   newData: true,
   originalQuery: "",
@@ -48,43 +37,4 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   changeIndex: (newIndex) => set((state) => ({ index: newIndex })),
   changeTemperature: (newTemperature) =>
     set((state) => ({ temperature: newTemperature })),
-}));
-
-export const useQueryDataArrStore = create<QueryDataArrState>((set, get) => ({
-  queryDataArr: [],
-  insertQueryData: (newData) =>
-    set((state) => ({
-      queryDataArr: [...state.queryDataArr, newData],
-    })),
-  updateQueryData: (newData, idx) => {
-    let index = idx > 0 ? idx : 0;
-    const updatedQuery = get().queryDataArr.map(
-      ({ content, originalQuery }, i) => {
-        if (i === index) {
-          //console.log("stg found");
-          return typeof newData === "string"
-            ? {
-                originalQuery,
-                content: newData,
-              }
-            : {
-                originalQuery: newData.originalQuery,
-                content: newData.content,
-              };
-        } else {
-          //console.log("not found");
-          return typeof newData === "string"
-            ? {
-                content,
-                originalQuery,
-              }
-            : {
-                ...newData,
-              };
-        }
-      }
-    );
-
-    set({ queryDataArr: updatedQuery });
-  },
 }));
