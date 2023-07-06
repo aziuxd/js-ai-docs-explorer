@@ -68,12 +68,12 @@ export const CustomInput: React.FC<CustomInputProps> = ({
         className="search-query"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        //disabled={isLoading ? true : newData ? true : false}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (e.shiftKey) {
               setSearchQuery((prev) => (prev + "\\").replace("\\", ""));
             } else {
+              e.preventDefault();
               onSubmit();
               return;
             }
