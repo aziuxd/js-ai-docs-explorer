@@ -16,7 +16,6 @@ export const User = () => {
         padding: "5px",
         margin: "5px",
         borderRadius: "5px",
-        cursor: "pointer",
         position: "absolute",
         bottom: "5px",
         right: 0,
