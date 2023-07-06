@@ -3,7 +3,7 @@ import { Textarea } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { BtnSubmit } from "./BtnSubmit";
 import { useWindowSize } from "@/hooks/useWindowSize";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 interface CustomInputProps {
   inputRef: React.MutableRefObject<HTMLTextAreaElement | null>;

@@ -78,3 +78,8 @@
   transition: all 0.2s;
   background-color: #4dabf7 !important;
 }
+
+.btn-reload-app:hover {
+  background-color: white !important;
+  opacity: 0.75 !important;
+}

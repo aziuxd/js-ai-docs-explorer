@@ -1,7 +1,6 @@
 "use client";
-import { useMantineTheme, Select, Slider } from "@mantine/core";
+import { Select, Slider } from "@mantine/core";
 import { useSettingsStore } from "../../lib/store";
-import { UserButton } from "@clerk/nextjs";
 import { User } from "./User";
 
 type Models = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5";
@@ -116,6 +115,19 @@ export const Sidebar = () => {
             input: "index-input",
           }}
         />
+        {/*<Button
+          bg={"white"}
+          color="blue"
+          className="btn-reload-app"
+          style={{
+            color: "#228be6 !important",
+          }}
+          onClick={() => {
+            router.refresh();
+          }}
+        >
+          Reload the app
+        </Button>*/}
       </div>
       <User />
     </div>

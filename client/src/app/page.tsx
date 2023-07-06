@@ -103,7 +103,6 @@ export default function Page() {
     });
 
     socket.on("askChatGPTResponse", (data: any) => {
-      console.log(data.data);
       setSearchQuery("");
       if (containerRef?.current)
         containerRef.current.scrollTop = containerRef.current.scrollHeight;

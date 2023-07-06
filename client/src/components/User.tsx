@@ -1,6 +1,5 @@
 "use client";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
 
 export const User = () => {
   const { user } = useUser();
