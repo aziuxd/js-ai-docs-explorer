@@ -3,7 +3,8 @@ import { Textarea } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { BtnSubmit } from "./BtnSubmit";
 import { useWindowSize } from "@/hooks/useWindowSize";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useUiStore } from "../../lib/store";
 
 interface CustomInputProps {
   inputRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -21,9 +22,10 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   const match = useMediaQuery("(max-width: 768px)");
   const matchLg = useMediaQuery("(min-width: 75em)");
   const { width } = useWindowSize();
+  const { newData, isLoading } = useUiStore();
   const ref = useRef(null);
 
-  //useEffect(() => {}, [width]);
+  useEffect(() => {}, []);
 
   return (
     <div
@@ -66,6 +68,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
         className="search-query"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        disabled={isLoading ? true : newData ? true : false}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             if (e.shiftKey) {

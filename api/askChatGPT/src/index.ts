@@ -23,7 +23,8 @@ const config = new Configuration({
 
 const openai = new OpenAIApi(config);
 
-const msgs: GptMessage[] = [];
+let msgs: GptMessage[] = [];
+const threshold = 16000;
 
 io.on("connection", (socket) => {
   socket.on("askChatGPT", async (data) => {
@@ -50,6 +51,14 @@ io.on("connection", (socket) => {
 
       msgs.push({ role: "user", content: newQuery });
 
+      let cont = msgs.map((x) => x.content + x.role).join();
+      //msgs.forEach((x) => (cont += x.role + x.content));
+      while (cont.length > threshold) {
+        msgs = msgs.slice(1);
+        cont = "";
+        cont = msgs.map((x) => x.role + x.content).join();
+      }
+
       //console.log(msgs.filter(({ role }) => role === "system"));
       const { data } = await openai.createChatCompletion(
         {
@@ -62,6 +71,7 @@ io.on("connection", (socket) => {
           responseType: "stream",
         }
       );
+      console.log("made req to chatGPT");
 
       socket.emit("askChatGPTResponse", {
         data: `${

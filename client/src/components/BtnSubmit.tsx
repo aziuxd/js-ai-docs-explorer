@@ -16,6 +16,9 @@ export const BtnSubmit: React.FC<BtnSubmitProps> = ({
 }) => {
   const match = useMediaQuery("(max-width: 400px)");
   const { newData } = useUiStore();
+
+  useEffect(() => {}, []);
+
   return (
     <Button
       className="btn-submit"
