@@ -14,6 +14,7 @@ async function start() {
       "http://localhost:3000",
       "http://localhost:8000/api/AskChatGPT/*",
       "*",
+      "https://silwa-ai-docs-explorer.vercel.app",
     ],
     allowedHeaders: ["Authorization", "Content-Type"],
   });

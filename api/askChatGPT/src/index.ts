@@ -13,7 +13,10 @@ interface GptMessage {
 
 const io = new Server({
   cors: {
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://silwa-ai-docs-explorer.vercel.app",
+    ],
   },
 });
 
