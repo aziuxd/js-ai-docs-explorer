@@ -5,6 +5,7 @@ import LanguageDetect from "languagedetect";
 import { Configuration, OpenAIApi } from "openai";
 import { Server } from "socket.io";
 import { doMaxTokensCalc } from "../../helpers";
+import { parse } from "path";
 
 interface GptMessage {
   role: "assistant" | "user" | "function" | "system";
@@ -56,7 +57,17 @@ io.on("connection", (socket) => {
         //socket.emit("err", { msg: "No data", originalQuery: query });
       } else {*/
       const apiData = await res.json();
-      const { data: parsedData }: { data: string[] } = apiData;
+      let { data: parsedData }: { data: string[] } = apiData;
+      //checking if parsedData does not goes over the max token limit for gpt model
+      while (parsedData[parsedData.length - 1].length >= threshold) {
+        if (parsedData[parsedData.length - 1] === "") {
+          parsedData = parsedData.slice(0, parsedData.length - 1);
+        }
+
+        parsedData[parsedData.length - 1] = parsedData[
+          parsedData.length - 1
+        ].slice(0, parsedData[parsedData.length - 1].length - 1);
+      }
       console.log(Array.isArray(parsedData));
       //possibility of having a response either in italian (if your query matches italian) or english in any other case
       const newQuery = `${query}, ${
