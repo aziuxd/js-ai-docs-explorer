@@ -72,7 +72,10 @@ io.on("connection", (socket) => {
       //possibility of having a response either in italian (if your query matches italian) or english in any other case
       const newQuery = `${query}, ${
         prob[0][0] === "italian" ? "sapendo che" : "knowing that"
-      }: ${parsedData?.slice(0, 18)}`;
+      }: ${parsedData?.slice(
+        0,
+        parsedData.length < 18 ? parsedData.length : 18
+      )}`;
 
       msgs.push({ role: "user", content: newQuery });
 
