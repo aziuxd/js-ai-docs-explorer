@@ -31,7 +31,7 @@ async function start() {
           Array.isArray(possibleIndexes) &&
           possibleIndexes.every((currIdx) => currIdx)
         ) {
-          const res = await Promise.all(
+          const res: any[] = await Promise.all(
             possibleIndexes.map(async (currIdx: string) => {
               return await doCognitiveQuery(query, currIdx);
             })
@@ -40,7 +40,11 @@ async function start() {
           if (res.every((i) => i.length === 0))
             reply.status(404).send({ ok: false });
 
-          return JSON.stringify({ data: res });
+          return JSON.stringify({
+            data: res
+              .sort((a, b) => b.score - a.score)
+              .map(({ content }: { content: string }) => content),
+          });
         } else {
           const idx = process.env.INDEX as string;
           const endpoint = process.env.SEARCH_ENDPOINT as string;

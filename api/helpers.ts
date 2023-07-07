@@ -83,14 +83,16 @@ export const doCognitiveQuery = async (query: string, currIndex: string) => {
   let res = [];
 
   for await (const result of results.results) {
+    res.push({ score: result.score });
     //@ts-ignore
     for (const curr_highlight of result.highlights?.content) {
-      res.push(curr_highlight);
+      //@ts-ignore
+      res[0].content = curr_highlight;
     }
   }
 
   //if there some cognitive search data return them
-  if (res.length) return res.toString();
+  if (res.length) return res[0];
   //if not redo the process without stemming (sometimes this can be the issue)
   else {
     results = await client.search(optimizeQuery(query, false), {
@@ -99,9 +101,11 @@ export const doCognitiveQuery = async (query: string, currIndex: string) => {
     });
 
     for await (const result of results.results) {
+      res.push({ score: result.score });
       //@ts-ignore
       for (const curr_highlight of result.highlights?.content) {
-        res.push(curr_highlight);
+        //@ts-ignore
+        res[0].content = curr_highlight;
       }
     }
 
@@ -112,18 +116,20 @@ export const doCognitiveQuery = async (query: string, currIndex: string) => {
       });
 
       for await (const result of results.results) {
+        res.push({ score: result.score });
         //@ts-ignore
         for (const curr_highlight of result.highlights?.content) {
-          res.push(curr_highlight);
+          //@ts-ignore
+          res[0].content = curr_highlight;
         }
       }
 
       if (!res.length) return [];
 
-      return res.toString();
+      return res[0];
     }
 
-    return res.toString();
+    return res[0];
   }
 };
 
