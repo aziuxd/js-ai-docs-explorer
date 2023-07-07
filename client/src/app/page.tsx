@@ -89,7 +89,6 @@ export default function Page() {
   };
 
   useEffect(() => {
-    queryDataArr;
     SocketHandler();
 
     if (inputRef.current) {

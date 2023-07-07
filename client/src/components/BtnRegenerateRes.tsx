@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@mantine/core";
-import { useEffect, forwardRef } from "react";
+import { useEffect, forwardRef, useRef } from "react";
 
 export const BtnRegenerateRes = forwardRef(function BtnRegenerateRes(
   {
@@ -12,9 +12,11 @@ export const BtnRegenerateRes = forwardRef(function BtnRegenerateRes(
   },
   ref: React.ForwardedRef<HTMLDivElement | null>
 ) {
+  const onMountRef = useRef(onComponentDidMount);
+
   useEffect(() => {
-    onComponentDidMount();
-  });
+    onMountRef.current();
+  }, []);
   return (
     <div
       style={{
