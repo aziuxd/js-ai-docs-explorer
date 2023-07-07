@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { useIndexes } from "./helpers";
 
 type Models = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5";
 
