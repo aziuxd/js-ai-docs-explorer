@@ -9,7 +9,8 @@
     "start-gpt": "ts-node askChatGPT/src/index.ts",
     "dev-gpt": "nodemon --exec ts-node askChatGPT/src/index.ts",
     "start-silwa": "ts-node Silwa/src/index.ts",
-    "dev-silwa": "nodemon --exec ts-node Silwa/src/index.ts"
+    "dev-silwa": "nodemon --exec ts-node Silwa/src/index.ts",
+    "debug": "nodemon --exec node --inspect-brk -r ts-node/register askChatGPT/src/index.ts"
   },
   "keywords": [],
   "author": "",

@@ -20,6 +20,7 @@ export const Sidebar = () => {
     changeModel,
     changeTemperature,
     changeIndex,
+    changePossibleIndexes,
   } = useSettingsStore();
   const { user } = useUser();
   const ref = useRef(null) as React.MutableRefObject<HTMLInputElement | null>;
@@ -31,6 +32,9 @@ export const Sidebar = () => {
   useEffect(() => {
     if (Array.isArray(possibleIndexes?.data)) {
       changeIndex(possibleIndexes?.data[0]?.IndexId);
+      changePossibleIndexes(
+        possibleIndexes?.data.map(({ IndexId }: { IndexId: string }) => IndexId)
+      );
     }
     //eslint-disable-next-line
   }, [user?.id, possibleIndexes]);

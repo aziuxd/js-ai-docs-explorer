@@ -16,9 +16,11 @@ interface SettingsState {
   model: Models;
   temperature: number;
   index: string;
+  possibleIndexes: any[];
   changeModel: (newModel: Models) => void;
   changeIndex: (newIndex: string) => void;
   changeTemperature: (newTemperature: number) => void;
+  changePossibleIndexes: (indexes: any[]) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -34,8 +36,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   model: "gpt-3.5-turbo-16k",
   temperature: 0.1,
   index: "",
+  possibleIndexes: [],
   changeModel: (newModel) => set((state) => ({ model: newModel })),
   changeIndex: (newIndex) => set((state) => ({ index: newIndex })),
   changeTemperature: (newTemperature) =>
     set((state) => ({ temperature: newTemperature })),
+  changePossibleIndexes: (indexes) =>
+    set((state) => ({ possibleIndexes: indexes })),
 }));

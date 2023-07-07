@@ -5,6 +5,7 @@ import LanguageDetect from "languagedetect";
 import { StemmerIt, StopwordsIt } from "@nlpjs/lang-it";
 //@ts-ignore
 import { StemmerEn, StopwordsEn } from "@nlpjs/lang-en";
+import { AzureKeyCredential, SearchClient } from "@azure/search-documents";
 
 //takes the natural language query and remove all stopping words
 //OLD FUNCTION
@@ -62,5 +63,74 @@ export const optimizeQuery = (nlQuery: string, useStemming: boolean = true) => {
     return optimizedQuery;
   } else {
     return nlQuery;
+  }
+};
+
+export const doCognitiveQuery = async (query: string, currIndex: string) => {
+  const endpoint = process.env.SEARCH_ENDPOINT as string;
+  const api_key = process.env.API_KEY as string;
+
+  const optimizedQuery = optimizeQuery(query);
+  console.log("GUARDA QUI PROGRAMMATORE: ", optimizedQuery);
+  const credentials = new AzureKeyCredential(api_key);
+  const client = new SearchClient(endpoint, currIndex, credentials);
+
+  let results = await client.search(optimizedQuery, {
+    highlightFields: "content",
+    top: 1,
+  });
+
+  let res = [];
+
+  for await (const result of results.results) {
+    //@ts-ignore
+    for (const curr_highlight of result.highlights?.content) {
+      res.push(curr_highlight);
+    }
+  }
+
+  //if there some cognitive search data return them
+  if (res.length) return res.toString();
+  //if not redo the process without stemming (sometimes this can be the issue)
+  else {
+    results = await client.search(optimizeQuery(query, false), {
+      highlightFields: "content",
+      top: 1,
+    });
+
+    for await (const result of results.results) {
+      //@ts-ignore
+      for (const curr_highlight of result.highlights?.content) {
+        res.push(curr_highlight);
+      }
+    }
+
+    if (!res.length) {
+      results = await client.search(query, {
+        highlightFields: "content",
+        top: 1,
+      });
+
+      for await (const result of results.results) {
+        //@ts-ignore
+        for (const curr_highlight of result.highlights?.content) {
+          res.push(curr_highlight);
+        }
+      }
+
+      if (!res.length) return [];
+
+      return res.toString();
+    }
+
+    return res.toString();
+  }
+};
+
+export const doMaxTokensCalc = (model: string) => {
+  if (model === "gpt-3.5-turbo-16k") {
+    return 16000;
+  } else {
+    return 4000;
   }
 };

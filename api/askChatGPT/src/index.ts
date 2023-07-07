@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 import LanguageDetect from "languagedetect";
 import { Configuration, OpenAIApi } from "openai";
 import { Server } from "socket.io";
+import { doMaxTokensCalc } from "../../helpers";
 
 interface GptMessage {
   role: "assistant" | "user" | "function" | "system";
@@ -24,12 +25,12 @@ const config = new Configuration({
 const openai = new OpenAIApi(config);
 
 let msgs: GptMessage[] = [];
-const threshold = 16000;
 
 io.on("connection", (socket) => {
   socket.on("askChatGPT", async (data) => {
     console.log("enpoint hit");
-    const { query, temperature, model, variant, index } = data;
+    const { query, temperature, model, variant, index, possibleIndexes } = data;
+    const threshold = model ? doMaxTokensCalc(model) : 16000;
     console.log("index: ", index);
     //console.log("msg: ", ms);
     //const msgs: GptMessage[] = [] as GptMessage[];
@@ -40,7 +41,15 @@ io.on("connection", (socket) => {
       const langDetector = new LanguageDetect();
       const prob = langDetector.detect(query);
       const res = await fetch(
-        `http://localhost:4000/cognitive/${query.replaceAll("/", ",")}/${index}`
+        `http://localhost:4000/cognitive/${query
+          .replaceAll("/", ",")
+          .replaceAll("?", "")}/${index}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            possibleIndexes,
+          }),
+        }
       );
       if (!res.ok) console.log("no data");
       /*if (!res.ok) {
@@ -48,10 +57,11 @@ io.on("connection", (socket) => {
       } else {*/
       const apiData = await res.json();
       const { data: parsedData }: { data: string[] } = apiData;
+      console.log(Array.isArray(parsedData));
       //possibility of having a response either in italian (if your query matches italian) or english in any other case
       const newQuery = `${query}, ${
         prob[0][0] === "italian" ? "sapendo che" : "knowing that"
-      }: ${parsedData?.slice(0, 15)}`;
+      }: ${parsedData?.slice(0, 18)}`;
 
       msgs.push({ role: "user", content: newQuery });
 
